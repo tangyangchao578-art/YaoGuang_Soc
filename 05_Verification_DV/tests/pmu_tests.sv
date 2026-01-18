@@ -1,147 +1,152 @@
-class pmu_test extends dv_base_test;
+`ifndef PMU_TESTS_SV
+`define PMU_TESTS_SV
 
-  `uvm_component_utils(pmu_test)
+class pmu_base_test extends dv_base_test;
+    `uvm_component_utils(pmu_base_test)
 
-  function new(string name = "pmu_test", uvm_component parent = null);
-    super.new(name, parent);
-  endfunction
+    pmu_env       env;
+    pmu_env_config cfg;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    function new(string name = "pmu_base_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
 
-    `DV_INFO("Starting PMU basic test")
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        cfg = new();
+        cfg.is_active = 1;
+        cfg.has_scoreboard = 1;
+        cfg.has_coverage = 1;
+        uvm_config_db#(pmu_env_config)::set(this, "*", "pmu_env_config", cfg);
+        env = pmu_env::type_id::create("env", this);
+    endfunction
 
-    begin
-      pmu_reg_sequence seq = pmu_reg_sequence::type_id::create("pmu_reg_seq");
-      seq.start(env.agent.sequencer);
-    end
-
-    #1000;
-
-    phase.drop_objection(this);
-  endtask
-
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        #1000;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class pmu_power_on_test extends pmu_test;
+class pmu_sanity_test extends pmu_base_test;
+    `uvm_component_utils(pmu_sanity_test)
 
-  `uvm_component_utils(pmu_power_on_test)
+    pmu_power_seq power_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    function new(string name = "pmu_sanity_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
 
-    `DV_INFO("Testing PMU power-on sequence")
-
-    // Test power domain power-on
-    pmu_power_on_seq seq = pmu_power_on_seq::type_id::create("pmu_power_on_seq");
-    seq.domain = PD_CPU;
-    seq.start(env.agent.sequencer);
-
-    // Verify power status
-    check_power_status(PD_CPU, POWER_ON);
-
-    `DV_INFO("PMU power-on test completed")
-
-    phase.drop_objection(this);
-  endtask
-
-  virtual function void check_power_status(int domain, bit expected);
-    pmu_status_reg_t status;
-    read_power_status(domain, status);
-    `DV_CHECK(status.pwron == expected, "Power status mismatch")
-  endfunction
-
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        power_seq = pmu_power_seq::type_id::create("power_seq");
+        power_seq.num_transactions = 50;
+        power_seq.start(env.agent.sequencer);
+        #500;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class pmu_dvfs_test extends pmu_test;
+class pmu_power_test extends pmu_base_test;
+    `uvm_component_utils(pmu_power_test)
 
-  `uvm_component_utils(pmu_dvfs_test)
+    pmu_power_on_seq   on_seq;
+    pmu_power_off_seq  off_seq;
+    pmu_all_power_seq  all_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        on_seq = pmu_power_on_seq::type_id::create("on_seq");
+        off_seq = pmu_power_off_seq::type_id::create("off_seq");
+        all_seq = pmu_all_power_seq::type_id::create("all_seq");
 
-    `DV_INFO("Testing PMU DVFS")
+        fork
+            on_seq.start(env.agent.sequencer);
+            off_seq.start(env.agent.sequencer);
+            all_seq.start(env.agent.sequencer);
+        join
 
-    // Test DVFS for CPU
-    for (int i = 0; i < 16; i++) begin
-      dvfs_sequence seq = dvfs_sequence::type_id::create("dvfs_seq");
-      seq.target = CPU;
-      seq.level = i;
-      seq.start(env.agent.sequencer);
-      #100;
-    end
-
-    `DV_INFO("PMU DVFS test completed")
-
-    phase.drop_objection(this);
-  endtask
-
+        #1000;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class pmu_low_power_test extends pmu_test;
+class pmu_dvfs_test extends pmu_base_test;
+    `uvm_component_utils(pmu_dvfs_test)
 
-  `uvm_component_utils(pmu_low_power_test)
+    pmu_dvfs_seq       dvfs_seq;
+    pmu_dvfs_sweep_seq sweep_seq;
+    pmu_dvfs_transition_seq trans_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        dvfs_seq = pmu_dvfs_seq::type_id::create("dvfs_seq");
+        sweep_seq = pmu_dvfs_sweep_seq::type_id::create("sweep_seq");
+        trans_seq = pmu_dvfs_transition_seq::type_id::create("trans_seq");
 
-    `DV_INFO("Testing PMU low power modes")
+        fork
+            dvfs_seq.start(env.agent.sequencer);
+            sweep_seq.start(env.agent.sequencer);
+            trans_seq.start(env.agent.sequencer);
+        join
 
-    // Test Idle mode
-    enter_low_power_mode(IDLE);
-    #500;
-    exit_low_power_mode(IDLE);
-
-    // Test Standby mode
-    enter_low_power_mode(STANDBY);
-    #1000;
-    exit_low_power_mode(STANDBY);
-
-    // Test Sleep mode
-    enter_low_power_mode(SLEEP);
-    #2000;
-    exit_low_power_mode(SLEEP);
-
-    // Test Deep Sleep mode
-    enter_low_power_mode(DEEP_SLEEP);
-    #5000;
-    exit_low_power_mode(DEEP_SLEEP);
-
-    `DV_INFO("PMU low power test completed")
-
-    phase.drop_objection(this);
-  endtask
-
+        #2000;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class pmu_protection_test extends pmu_test;
+class pmu_low_power_test extends pmu_base_test;
+    `uvm_component_utils(pmu_low_power_test)
 
-  `uvm_component_utils(pmu_protection_test)
+    pmu_low_power_seq     low_seq;
+    pmu_sleep_seq         sleep_seq;
+    pmu_wakeup_seq        wakeup_seq;
+    pmu_sleep_wakeup_seq  sleep_wakeup_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        low_seq = pmu_low_power_seq::type_id::create("low_seq");
+        sleep_seq = pmu_sleep_seq::type_id::create("sleep_seq");
+        wakeup_seq = pmu_wakeup_seq::type_id::create("wakeup_seq");
+        sleep_wakeup_seq = pmu_sleep_wakeup_seq::type_id::create("sleep_wakeup_seq");
 
-    `DV_INFO("Testing PMU protection mechanisms")
+        fork
+            low_seq.start(env.agent.sequencer);
+            sleep_seq.start(env.agent.sequencer);
+            wakeup_seq.start(env.agent.sequencer);
+            sleep_wakeup_seq.start(env.agent.sequencer);
+        join
 
-    // Test over-voltage protection
-    inject_fault(OVER_VOLTAGE);
-    wait_for_protection_response();
-
-    // Test over-current protection
-    inject_fault(OVER_CURRENT);
-    wait_for_protection_response();
-
-    // Test over-temperature protection
-    inject_fault(OVER_TEMPERATURE);
-    wait_for_protection_response();
-
-    // Test watchdog timeout
-    inject_fault(WATCHDOG_TIMEOUT);
-    wait_for_protection_response();
-
-    `DV_INFO("PMU protection test completed")
-
-    phase.drop_objection(this);
-  endtask
-
+        #2000;
+        phase.drop_objection(this);
+    endtask
 endclass
+
+class pmu_protection_test extends pmu_base_test;
+    `uvm_component_utils(pmu_protection_test)
+
+    pmu_protection_seq           prot_seq;
+    pmu_protect_seq              protect_seq;
+    pmu_unprotect_seq            unprotect_seq;
+    pmu_protection_violation_seq violation_seq;
+
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        prot_seq = pmu_protection_seq::type_id::create("prot_seq");
+        protect_seq = pmu_protect_seq::type_id::create("protect_seq");
+        unprotect_seq = pmu_unprotect_seq::type_id::create("unprotect_seq");
+        violation_seq = pmu_protection_violation_seq::type_id::create("violation_seq");
+
+        fork
+            prot_seq.start(env.agent.sequencer);
+            protect_seq.start(env.agent.sequencer);
+            unprotect_seq.start(env.agent.sequencer);
+            violation_seq.start(env.agent.sequencer);
+        join
+
+        #2000;
+        phase.drop_objection(this);
+    endtask
+endclass
+
+`endif

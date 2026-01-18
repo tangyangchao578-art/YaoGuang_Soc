@@ -1,0 +1,80 @@
+name: npu_regression
+description: NPU Cluster verification regression suite
+
+testsuites:
+  npu_sanity:
+    tests:
+      - npu_sanity_test
+    description: Quick smoke test for basic functionality
+    priority: P0
+    timeout: 3600
+    parallel_jobs: 8
+    pass_threshold: 100.0
+
+  npu_matmul:
+    tests:
+      - npu_matmul_test
+    description: INT8/INT16/FP16 matrix multiplication tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  npu_activation:
+    tests:
+      - npu_activation_test
+    description: ReLU/Sigmoid/Tanh activation function tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  npu_pooling:
+    tests:
+      - npu_pooling_test
+    description: Max/Avg pooling operation tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  npu_performance:
+    tests:
+      - npu_performance_test
+    description: Performance and stress tests
+    priority: P1
+    timeout: 14400
+    parallel_jobs: 2
+    pass_threshold: 95.0
+
+regression_settings:
+  seed: 12345
+  waves: false
+  coverage: true
+  log_level: DEBUG
+  uvm_verbosity: UVM_MEDIUM
+
+coverage_goals:
+  code_coverage:
+    requirement: 100.0
+    exclude: []
+  functional_coverage:
+    requirement: 95.0
+    coverpoints:
+      - op_type
+      - data_width
+      - matrix_size
+      - status
+
+targets:
+  sim:
+    tool: xcelium
+    args: -timescale 1ns/1ps
+
+  debug:
+    tool: xcelium
+    args: -timescale 1ns/1ps -gui
+
+  regress:
+    tool: xcelium
+    args: -timescale 1ns/1ps -coverage all

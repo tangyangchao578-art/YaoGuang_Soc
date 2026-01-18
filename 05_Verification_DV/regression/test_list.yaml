@@ -1,0 +1,797 @@
+# YaoGuang SoC 回归测试用例列表
+# Test List for YaoGuang SoC DV Regression
+# Version: 1.0
+# Date: 2026-01-18
+
+# ==========================================
+# 模块1: CPU_ISC (CPU指令集控制器)
+# ==========================================
+cpu_isc:
+  description: "CPU指令集控制器验证"
+  priority: P0
+  tests:
+    - name: cpu_isc_basic
+      description: "基本指令执行测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+        - functional: 75
+      tags: [smoke, basic]
+
+    - name: cpu_isc_arith
+      description: "算术指令测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [cpu_isc_basic]
+      coverage:
+        - code: 90
+        - functional: 85
+      tags: [functional, arithmetic]
+
+    - name: cpu_isc_logic
+      description: "逻辑指令测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [cpu_isc_basic]
+      coverage:
+        - code: 90
+        - functional: 85
+      tags: [functional, logic]
+
+    - name: cpu_isc_mem
+      description: "内存访问指令测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [cpu_isc_basic]
+      coverage:
+        - code: 92
+        - functional: 88
+      tags: [functional, memory]
+
+    - name: cpu_isc_intr
+      description: "中断指令测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [cpu_isc_basic]
+      coverage:
+        - code: 85
+        - functional: 80
+      tags: [functional, interrupt]
+
+    - name: cpu_isc_boundary
+      description: "边界条件测试"
+      tier: stress
+      timeout: 3600
+      depends_on: [cpu_isc_arith, cpu_isc_mem]
+      coverage:
+        - code: 95
+        - functional: 90
+      tags: [stress, boundary]
+
+    - name: cpu_isc_random
+      description: "随机指令序列测试"
+      tier: random
+      iterations: 1000
+      timeout: 5400
+      depends_on: [cpu_isc_basic]
+      coverage:
+        - code: 98
+        - functional: 95
+      tags: [random, stress]
+
+# ==========================================
+# 模块2: AXI_BRIDGE (AXI总线桥接器)
+# ==========================================
+axi_bridge:
+  description: "AXI4总线桥接器验证"
+  priority: P0
+  tests:
+    - name: axi_bridge_basic
+      description: "基本读写测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+        - assertion: 75
+      tags: [smoke, basic]
+
+    - name: axi_bridge_burst
+      description: "突发传输测试"
+      tier: functional
+      timeout: 2400
+      depends_on: [axi_bridge_basic]
+      coverage:
+        - code: 92
+        - assertion: 88
+      tags: [functional, burst]
+
+    - name: axi_bridge_lock
+      description: "锁定传输测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [axi_bridge_basic]
+      coverage:
+        - code: 85
+        - assertion: 80
+      tags: [functional, lock]
+
+    - name: axi_bridge_stress
+      description: "压力测试"
+      tier: stress
+      timeout: 3600
+      depends_on: [axi_bridge_burst]
+      coverage:
+        - code: 95
+        - assertion: 92
+      tags: [stress]
+
+    - name: axi_bridge_random
+      description: "随机传输测试"
+      tier: random
+      iterations: 500
+      timeout: 5400
+      depends_on: [axi_bridge_basic]
+      coverage:
+        - code: 98
+        - assertion: 95
+      tags: [random]
+
+# ==========================================
+# 模块3: NOC_ROUTER (NoC路由器)
+# ==========================================
+noc_router:
+  description: "片上网络路由器验证"
+  priority: P0
+  tests:
+    - name: noc_router_basic
+      description: "基本路由测试"
+      tier: functional
+      timeout: 2400
+      depends_on: []
+      coverage:
+        - code: 85
+        - fsm: 80
+      tags: [functional, basic]
+
+    - name: noc_router_prio
+      description: "优先级路由测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [noc_router_basic]
+      coverage:
+        - code: 90
+        - fsm: 85
+      tags: [functional, priority]
+
+    - name: noc_router_congest
+      description: "拥塞控制测试"
+      tier: stress
+      timeout: 3600
+      depends_on: [noc_router_prio]
+      coverage:
+        - code: 95
+        - fsm: 90
+      tags: [stress, congestion]
+
+# ==========================================
+# 模块4: INTERRUPT_CTRL (中断控制器)
+# ==========================================
+interrupt_ctrl:
+  description: "中断控制器验证"
+  priority: P1
+  tests:
+    - name: interrupt_basic
+      description: "基本中断测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+        - fsm: 75
+      tags: [smoke, basic]
+
+    - name: interrupt_cascade
+      description: "中断级联测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [interrupt_basic]
+      coverage:
+        - code: 90
+        - fsm: 85
+      tags: [functional, cascade]
+
+    - name: interrupt_prio
+      description: "中断优先级测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [interrupt_basic]
+      coverage:
+        - code: 88
+        - fsm: 82
+      tags: [functional, priority]
+
+    - name: interrupt_random
+      description: "随机中断测试"
+      tier: random
+      iterations: 500
+      timeout: 3600
+      depends_on: [interrupt_basic]
+      coverage:
+        - code: 95
+        - fsm: 92
+      tags: [random]
+
+# ==========================================
+# 模块5: TIMER (定时器)
+# ==========================================
+timer:
+  description: "定时器模块验证"
+  priority: P1
+  tests:
+    - name: timer_basic
+      description: "基本定时功能测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: timer_prescale
+      description: "预分频测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [timer_basic]
+      coverage:
+        - code: 90
+      tags: [functional, prescale]
+
+    - name: timer_cascade
+      description: "级联定时器测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [timer_basic]
+      coverage:
+        - code: 88
+      tags: [functional, cascade]
+
+    - name: timer_stress
+      description: "压力测试"
+      tier: stress
+      timeout: 7200
+      depends_on: [timer_prescale]
+      coverage:
+        - code: 95
+      tags: [stress]
+
+# ==========================================
+# 模块6: UART (串口)
+# ==========================================
+uart:
+  description: "UART串口验证"
+  priority: P1
+  tests:
+    - name: uart_basic
+      description: "基本收发测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+        - assertion: 75
+      tags: [smoke, basic]
+
+    - name: uart_baud
+      description: "波特率测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [uart_basic]
+      coverage:
+        - code: 90
+        - assertion: 85
+      tags: [functional, baudrate]
+
+    - name: uart_fifo
+      description: "FIFO测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [uart_basic]
+      coverage:
+        - code: 88
+        - assertion: 82
+      tags: [functional, fifo]
+
+    - name: uart_stress
+      description: "压力测试"
+      tier: stress
+      timeout: 7200
+      depends_on: [uart_baud]
+      coverage:
+        - code: 95
+        - assertion: 92
+      tags: [stress]
+
+# ==========================================
+# 模块7: SPI (SPI控制器)
+# ==========================================
+spi:
+  description: "SPI控制器验证"
+  priority: P1
+  tests:
+    - name: spi_basic
+      description: "基本SPI传输测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: spi_mode
+      description: "SPI模式测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [spi_basic]
+      coverage:
+        - code: 90
+      tags: [functional, mode]
+
+    - name: spi_fifo
+      description: "FIFO测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [spi_basic]
+      coverage:
+        - code: 88
+      tags: [functional, fifo]
+
+# ==========================================
+# 模块8: I2C (I2C控制器)
+# ==========================================
+i2c:
+  description: "I2C控制器验证"
+  priority: P1
+  tests:
+    - name: i2c_basic
+      description: "基本I2C传输测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: i2c_addr
+      description: "地址匹配测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [i2c_basic]
+      coverage:
+        - code: 90
+      tags: [functional, address]
+
+    - name: i2c_multi
+      description: "多主设备测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [i2c_basic]
+      coverage:
+        - code: 88
+      tags: [functional, multi-master]
+
+# ==========================================
+# 模块9: GPIO (GPIO控制器)
+# ==========================================
+gpio:
+  description: "GPIO控制器验证"
+  priority: P1
+  tests:
+    - name: gpio_basic
+      description: "基本输入输出测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: gpio_intr
+      description: "中断测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [gpio_basic]
+      coverage:
+        - code: 88
+      tags: [functional, interrupt]
+
+    - name: gpio_debounce
+      description: "去抖测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [gpio_basic]
+      coverage:
+        - code: 85
+      tags: [functional, debounce]
+
+    - name: gpio_stress
+      description: "压力测试"
+      tier: stress
+      timeout: 7200
+      depends_on: [gpio_intr]
+      coverage:
+        - code: 95
+      tags: [stress]
+
+# ==========================================
+# 模块10: WDT (看门狗定时器)
+# ==========================================
+wdt:
+  description: "看门狗定时器验证"
+  priority: P1
+  tests:
+    - name: wdt_basic
+      description: "基本看门狗功能测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: wdt_reset
+      description: "复位测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [wdt_basic]
+      coverage:
+        - code: 90
+      tags: [functional, reset]
+
+# ==========================================
+# 模块11: PWM (PWM控制器)
+# ==========================================
+pwm:
+  description: "PWM控制器验证"
+  priority: P2
+  tests:
+    - name: pwm_basic
+      description: "基本PWM输出测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: pwm_duty
+      description: "占空比测试"
+      tier: functional
+      timeout: 1200
+      depends_on: [pwm_basic]
+      coverage:
+        - code: 90
+      tags: [functional, duty-cycle]
+
+# ==========================================
+# 模块12: SAFETY_ISLAND (安全岛)
+# ==========================================
+safety_island:
+  description: "安全岛(ASIL-D)验证"
+  priority: P0
+  tests:
+    - name: safety_island_basic
+      description: "基本安全功能测试"
+      tier: smoke
+      timeout: 1800
+      depends_on: []
+      coverage:
+        - code: 85
+        - fsm: 80
+        - toggle: 75
+      tags: [smoke, safety, asil-d]
+
+    - name: safety_island_lockstep
+      description: "双核锁步测试"
+      tier: functional
+      timeout: 2400
+      depends_on: [safety_island_basic]
+      coverage:
+        - code: 92
+        - fsm: 88
+        - toggle: 85
+      tags: [functional, lockstep, safety]
+
+    - name: safety_island_ecc
+      description: "ECC校验测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [safety_island_basic]
+      coverage:
+        - code: 90
+        - assertion: 85
+      tags: [functional, ecc, safety]
+
+# ==========================================
+# 模块13: DMA (DMA控制器)
+# ==========================================
+dma:
+  description: "DMA控制器验证"
+  priority: P1
+  tests:
+    - name: dma_basic
+      description: "基本DMA传输测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+        - fsm: 75
+      tags: [smoke, basic]
+
+    - name: dma_chain
+      description: "链表传输测试"
+      tier: functional
+      timeout: 2400
+      depends_on: [dma_basic]
+      coverage:
+        - code: 90
+        - fsm: 85
+      tags: [functional, linked-list]
+
+    - name: dma_burst
+      description: "突发传输测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [dma_basic]
+      coverage:
+        - code: 88
+        - fsm: 82
+      tags: [functional, burst]
+
+    - name: dma_scatter
+      description: "分散收集测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [dma_basic]
+      coverage:
+        - code: 90
+        - fsm: 85
+      tags: [functional, scatter-gather]
+
+    - name: dma_random
+      description: "随机传输测试"
+      tier: random
+      iterations: 500
+      timeout: 5400
+      depends_on: [dma_basic]
+      coverage:
+        - code: 95
+        - fsm: 92
+      tags: [random]
+
+# ==========================================
+# 模块14: SRAM_CTRL (SRAM控制器)
+# ==========================================
+sram_ctrl:
+  description: "SRAM控制器验证"
+  priority: P1
+  tests:
+    - name: sram_ctrl_basic
+      description: "基本读写测试"
+      tier: smoke
+      timeout: 300
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [smoke, basic]
+
+    - name: sram_ctrl_ecc
+      description: "ECC测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [sram_ctrl_basic]
+      coverage:
+        - code: 90
+        - ecc: 85
+      tags: [functional, ecc]
+
+# ==========================================
+# 模块15: FLASH_CTRL (Flash控制器)
+# ==========================================
+flash_ctrl:
+  description: "Flash控制器验证"
+  priority: P1
+  tests:
+    - name: flash_ctrl_basic
+      description: "基本读写测试"
+      tier: functional
+      timeout: 2400
+      depends_on: []
+      coverage:
+        - code: 80
+      tags: [functional, basic]
+
+    - name: flash_ctrl_erase
+      description: "擦除测试"
+      tier: functional
+      timeout: 1800
+      depends_on: [flash coverage:
+        -_ctrl_basic]
+      code: 88
+      tags: [functional, erase]
+
+# ==========================================
+# 模块16: CACHE_COH (缓存一致性)
+# ==========================================
+cache_coh:
+  description: "缓存一致性模块验证"
+  priority: P1
+  tests:
+    - name: coherence_basic
+      description: "基本一致性测试"
+      tier: functional
+      timeout: 3600
+      depends_on: []
+      coverage:
+        - code: 85
+        - fsm: 80
+        - assertion: 75
+      tags: [functional, coherence]
+
+    - name: coherence_snoop
+      description: "监听测试"
+      tier: stress
+      timeout: 5400
+      depends_on: [coherence_basic]
+      coverage:
+        - code: 92
+        - fsm: 88
+        - assertion: 85
+      tags: [stress, snoop]
+
+# ==========================================
+# 模块17: ERROR_INJECT (错误注入)
+# ==========================================
+error_inject:
+  description: "错误注入模块验证"
+  priority: P2
+  tests:
+    - name: error_inject_parity
+      description: "奇偶校验错误测试"
+      tier: error
+      timeout: 2400
+      depends_on: []
+      coverage:
+        - code: 85
+      tags: [error, parity]
+
+    - name: error_inject_ecc
+      description: "ECC错误测试"
+      tier: error
+      timeout: 2400
+      depends_on: []
+      coverage:
+        - code: 88
+      tags: [error, ecc]
+
+    - name: error_inject_timeout
+      description: "超时错误测试"
+      tier: error
+      timeout: 1800
+      depends_on: []
+      coverage:
+        - code: 82
+      tags: [error, timeout]
+
+# ==========================================
+# 模块18: POWER_MGMT (功耗管理)
+# ==========================================
+power_mgmt:
+  description: "功耗管理模块验证"
+  priority: P2
+  tests:
+    - name: power_gating_basic
+      description: "电源门控测试"
+      tier: functional
+      timeout: 2400
+      depends_on: []
+      coverage:
+        - code: 85
+      tags: [functional, power-gating]
+
+    - name: power_clock_gating
+      description: "时钟门控测试"
+      tier: functional
+      timeout: 1800
+      depends_on: []
+      coverage:
+        - code: 82
+      tags: [functional, clock-gating]
+
+# ==========================================
+# 系统级测试
+# ==========================================
+system:
+  description: "系统级集成测试"
+  priority: P0
+  tests:
+    - name: soak_test_24h
+      description: "24小时浸泡测试"
+      tier: soak
+      timeout: 86400
+      depends_on: []
+      coverage:
+        - code: 98
+        - functional: 95
+      tags: [soak, long-running]
+
+    - name: soak_test_48h
+      description: "48小时浸泡测试"
+      tier: soak
+      timeout: 172800
+      depends_on: []
+      coverage:
+        - code: 99
+        - functional: 98
+      tags: [soak, long-running]
+
+    - name: interop_dma_uart
+      description: "DMA-UART互操作性测试"
+      tier: interop
+      timeout: 3600
+      depends_on: [dma_basic, uart_basic]
+      coverage:
+        - code: 90
+      tags: [interop]
+
+    - name: interop_spi_gpio
+      description: "SPI-GPIO互操作性测试"
+      tier: interop
+      timeout: 3600
+      depends_on: [spi_basic, gpio_basic]
+      coverage:
+        - code: 88
+      tags: [interop]
+
+    - name: interop_timer_intr
+      description: "Timer-Interrupt互操作性测试"
+      tier: interop
+      timeout: 3600
+      depends_on: [timer_basic, interrupt_basic]
+      coverage:
+        - code: 90
+      tags: [interop]
+
+# ==========================================
+# 统计信息
+# ==========================================
+statistics:
+  total_tests: 85
+  total_modules: 17
+  
+  by_tier:
+    smoke: 17
+    functional: 45
+    stress: 12
+    random: 5
+    error: 3
+    interop: 3
+    soak: 2
+  
+  by_priority:
+    P0: 25
+    P1: 45
+    P2: 15
+  
+  total_estimated_runtime:
+    smoke: 5100s  # 1.4小时
+    functional: 75600s  # 21小时
+    stress: 43200s  # 12小时
+    random: 21600s  # 6小时
+    error: 6600s  # 1.8小时
+    interop: 10800s  # 3小时
+    soak: 259200s  # 72小时
+    total: 432000s  # 120小时

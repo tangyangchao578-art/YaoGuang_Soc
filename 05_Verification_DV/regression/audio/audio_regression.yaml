@@ -1,0 +1,44 @@
+name: audio_regression
+description: Audio Controller Regression Suite
+
+testlist:
+  - name: audio_basic_test
+    description: Audio basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: audio_i2s_test
+    description: I2S interface test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: audio_pdm_test
+    description: PDM microphone test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: audio_error_test
+    description: Audio error handling test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: audio_performance_test
+    description: Audio throughput performance test
+    type: performance
+    priority: P2
+    timeout: 500ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%

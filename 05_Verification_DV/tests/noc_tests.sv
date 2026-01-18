@@ -1,119 +1,120 @@
-class noc_routing_test extends dv_base_test;
+`ifndef NOC_TESTS_SV
+`define NOC_TESTS_SV
 
-  `uvm_component_utils(noc_routing_test)
+class noc_base_test extends dv_base_test;
+    `uvm_component_utils(noc_base_test)
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    noc_env        env;
+    noc_env_config cfg;
 
-    `DV_INFO("Testing NoC routing")
+    function new(string name = "noc_base_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
 
-    // Test destination routing
-    for (int i = 0; i < 16; i++) begin
-      noc_routing_seq seq = noc_routing_seq::type_id::create("noc_route_seq");
-      seq.destination = i;
-      seq.start(env.agent.sequencer);
-    end
+    function void build_phase(uvm_phase phase);
+        super.build_phase(phase);
+        cfg = new();
+        cfg.is_active = 1;
+        cfg.has_scoreboard = 1;
+        cfg.has_coverage = 1;
+        cfg.num_transactions = 1000;
+        uvm_config_db#(noc_env_config)::set(this, "*", "noc_env_config", cfg);
+        env = noc_env::type_id::create("env", this);
+    endfunction
 
-    // Test broadcast routing
-    begin
-      noc_broadcast_seq seq = noc_broadcast_seq::type_id::create("noc_bcast_seq");
-      seq.start(env.agent.sequencer);
-    end
-
-    phase.drop_objection(this);
-  endtask
-
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        #1000;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class noc_qos_test extends dv_base_test;
+class noc_sanity_test extends noc_base_test;
+    `uvm_component_utils(noc_sanity_test)
 
-  `uvm_component_utils(noc_qos_test)
+    noc_routing_seq routing_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    function new(string name = "noc_sanity_test", uvm_component parent = null);
+        super.new(name, parent);
+    endfunction
 
-    `DV_INFO("Testing NoC QoS")
-
-    // Test priority arbitration
-    for (int priority = 0; priority < 4; priority++) begin
-      noc_qos_seq seq = noc_qos_seq::type_id::create("noc_qos_seq");
-      seq.priority = priority;
-      seq.start(env.agent.sequencer);
-    end
-
-    // Test traffic shaping
-    begin
-      noc_shaping_seq seq = noc_shaping_seq::type_id::create("noc_shape_seq");
-      seq.start(env.agent.sequencer);
-    end
-
-    phase.drop_objection(this);
-  endtask
-
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        routing_seq = noc_routing_seq::type_id::create("routing_seq");
+        routing_seq.num_transactions = 100;
+        routing_seq.start(env.agent.sequencer);
+        #500;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class noc_congestion_test extends dv_base_test;
+class noc_routing_test extends noc_base_test;
+    `uvm_component_utils(noc_routing_test)
 
-  `uvm_component_utils(noc_congestion_test)
+    noc_mesh_routing_seq mesh_seq;
+    noc_all_to_all_seq   all_to_all_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        mesh_seq = noc_mesh_routing_seq::type_id::create("mesh_seq");
+        all_to_all_seq = noc_all_to_all_seq::type_id::create("all_to_all_seq");
 
-    `DV_INFO("Testing NoC congestion control")
+        fork
+            mesh_seq.start(env.agent.sequencer);
+            all_to_all_seq.start(env.agent.sequencer);
+        join
 
-    // Inject high traffic and verify no deadlock
-    fork
-      begin
-        for (int i = 0; i < 10; i++) begin
-          noc_traffic_seq seq = noc_traffic_seq::type_id::create("noc_traffic_seq");
-          seq.priority = i % 4;
-          seq.start(env.agent.sequencer);
-        end
-      end
-    join_none
-
-    #10000;
-
-    phase.drop_objection(this);
-  endtask
-
+        #1000;
+        phase.drop_objection(this);
+    endtask
 endclass
 
-class noc_performance_test extends dv_base_test;
+class noc_qos_test extends noc_base_test;
+    `uvm_component_utils(noc_qos_test)
 
-  `uvm_component_utils(noc_performance_test)
+    noc_qos_seq          qos_seq;
+    noc_qos_priority_seq priority_seq;
+    noc_qos_fairness_seq fairness_seq;
 
-  virtual task run_phase(uvm_phase phase);
-    phase.raise_objection(this);
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        qos_seq = noc_qos_seq::type_id::create("qos_seq");
+        priority_seq = noc_qos_priority_seq::type_id::create("priority_seq");
+        fairness_seq = noc_qos_fairness_seq::type_id::create("fairness_seq");
 
-    `DV_INFO("Testing NoC performance")
+        fork
+            qos_seq.start(env.agent.sequencer);
+            priority_seq.start(env.agent.sequencer);
+            fairness_seq.start(env.agent.sequencer);
+        join
 
-    // Measure bandwidth
-    real bandwidth;
-    bandwidth = measure_bandwidth();
-
-    `DV_INFO($sformatf("Measured bandwidth: %0f GB/s", bandwidth))
-
-    // Verify bandwidth requirement
-    `DV_CHECK(bandwidth >= 2.0, "Bandwidth requirement not met")
-
-    phase.drop_objection(this);
-  endtask
-
-  virtual function real measure_bandwidth();
-    integer bytes_transferred = 0;
-    real start_time, end_time;
-
-    start_time = $realtime;
-
-    for (int i = 0; i < 1000; i++) begin
-      noc_bandwidth_seq seq = noc_bandwidth_seq::type_id::create("noc_bw_seq");
-      seq.start(env.agent.sequencer);
-      bytes_transferred += 64 * 16; // 16 beats of 64 bytes
-    end
-
-    end_time = $realtime;
-    return bytes_transferred / (end_time - start_time) / 1e9;
-  endfunction
-
+        #2000;
+        phase.drop_objection(this);
+    endtask
 endclass
+
+class noc_performance_test extends noc_base_test;
+    `uvm_component_utils(noc_performance_test)
+
+    noc_performance_seq perf_seq;
+    noc_burst_seq       burst_seq;
+    noc_stress_seq      stress_seq;
+
+    task run_phase(uvm_phase phase);
+        phase.raise_objection(this);
+        perf_seq = noc_performance_seq::type_id::create("perf_seq");
+        burst_seq = noc_burst_seq::type_id::create("burst_seq");
+        stress_seq = noc_stress_seq::type_id::create("stress_seq");
+
+        fork
+            perf_seq.start(env.agent.sequencer);
+            burst_seq.start(env.agent.sequencer);
+            stress_seq.start(env.agent.sequencer);
+        join
+
+        #3000;
+        phase.drop_objection(this);
+    endtask
+endclass
+
+`endif

@@ -1,0 +1,73 @@
+name: noc_regression
+description: NoC verification regression suite
+
+testsuites:
+  noc_sanity:
+    tests:
+      - noc_sanity_test
+    description: Quick smoke test for basic functionality
+    priority: P0
+    timeout: 3600
+    parallel_jobs: 8
+    pass_threshold: 100.0
+
+  noc_routing:
+    tests:
+      - noc_routing_test
+    description: Routing and mesh topology tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  noc_qos:
+    tests:
+      - noc_qos_test
+    description: QoS and priority tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  noc_performance:
+    tests:
+      - noc_performance_test
+    description: Bandwidth and performance tests
+    priority: P1
+    timeout: 14400
+    parallel_jobs: 2
+    pass_threshold: 95.0
+
+regression_settings:
+  seed: 34567
+  waves: false
+  coverage: true
+  log_level: DEBUG
+  uvm_verbosity: UVM_MEDIUM
+
+coverage_goals:
+  code_coverage:
+    requirement: 100.0
+    exclude: []
+  functional_coverage:
+    requirement: 95.0
+    coverpoints:
+      - packet_type
+      - src_id
+      - dst_id
+      - qos_level
+      - burst_size
+      - status
+
+targets:
+  sim:
+    tool: xcelium
+    args: -timescale 1ns/1ps
+
+  debug:
+    tool: xcelium
+    args: -timescale 1ns/1ps -gui
+
+  regress:
+    tool: xcelium
+    args: -timescale 1ns/1ps -coverage all

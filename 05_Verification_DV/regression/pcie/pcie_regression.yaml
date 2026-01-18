@@ -1,0 +1,112 @@
+name: pcie_regression
+description: PCIe Controller Regression Suite
+
+testlist:
+  - name: pcie_basic_test
+    description: PCIe basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42, 123]
+    
+  - name: pcie_cfg_space_test
+    description: PCIe configuration space access test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: pcie_mem_access_test
+    description: PCIe memory space access test
+    type: sanity
+    priority: P0
+    timeout: 200ms
+    seeds: [0, 42]
+    
+  - name: pcie_io_space_test
+    description: PCIe IO space access test
+    type: sanity
+    priority: P0
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: pcie_burst_test
+    description: PCIe burst transfer test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: pcie_error_test
+    description: PCIe error handling test
+    type: error
+    priority: P1
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: pcie_parity_err_test
+    description: PCIe parity error detection test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: pcie_unalign_test
+    description: PCIe unaligned access test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: pcie_timeout_test
+    description: PCIe timeout handling test
+    type: error
+    priority: P1
+    timeout: 500ms
+    seeds: [0]
+    
+  - name: pcie_poison_tlp_test
+    description: PCIe poisoned TLP test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: pcie_performance_test
+    description: PCIe throughput performance test
+    type: performance
+    priority: P2
+    timeout: 1000ms
+    seeds: [0]
+    
+  - name: pcie_max_payload_test
+    description: PCIe max payload test
+    type: performance
+    priority: P2
+    timeout: 500ms
+    seeds: [0]
+    
+  - name: pcie_priority_test
+    description: PCIe priority traffic test
+    type: performance
+    priority: P2
+    timeout: 500ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%
+  - name: toggle_coverage
+    goal: 90%
+
+global_compile_options:
+  - "+define+UVM_NO_DEPRECATED"
+  - "+define+PCIe_GEN4"
+  - "-top pcie_tb"
+
+run_options:
+  - "-l pcie_regression.log"
+  - "-sv_seed random"
+  - "+ntb_random_seed_automatic"

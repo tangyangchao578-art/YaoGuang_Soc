@@ -1,0 +1,654 @@
+# YaoGuang SoC 覆盖率目标配置
+# Coverage Targets Configuration for YaoGuang SoC DV Verification
+# Version: 1.0
+# Date: 2026-01-18
+
+# ==========================================
+# 全局覆盖率目标
+# ==========================================
+global_targets:
+  # 最低通过标准
+  minimum:
+    code_coverage: 90.0
+    branch_coverage: 85.0
+    condition_coverage: 85.0
+    toggle_coverage: 80.0
+    fsm_coverage: 85.0
+    assertion_coverage: 90.0
+    functional_coverage: 85.0
+  
+  # 推荐目标
+  recommended:
+    code_coverage: 95.0
+    branch_coverage: 92.0
+    condition_coverage: 90.0
+    toggle_coverage: 88.0
+    fsm_coverage: 92.0
+    assertion_coverage: 95.0
+    functional_coverage: 90.0
+  
+  # 优秀目标
+  excellent:
+    code_coverage: 98.0
+    branch_coverage: 95.0
+    condition_coverage: 95.0
+    toggle_coverage: 93.0
+    fsm_coverage: 95.0
+    assertion_coverage: 98.0
+    functional_coverage: 95.0
+
+# ==========================================
+# 模块级覆盖率目标
+# ==========================================
+module_targets:
+  # ==========================================
+  # 模块1: CPU_ISC (优先级P0)
+  # ==========================================
+  cpu_isc:
+    description: "CPU指令集控制器"
+    priority: P0
+    targets:
+      code_coverage: 95.0
+      branch_coverage: 92.0
+      condition_coverage: 90.0
+      toggle_coverage: 88.0
+      fsm_coverage: 92.0
+      assertion_coverage: 95.0
+      functional_coverage: 90.0
+    
+    # 特殊覆盖率要求
+    special:
+      - type: instruction_coverage
+        target: 98.0
+        description: "指令覆盖率"
+      - type: state_coverage
+        target: 95.0
+        description: "流水线状态覆盖率"
+      - type: exception_coverage
+        target: 100.0
+        description: "异常处理覆盖率(必须100%)"
+    
+    # 覆盖率权重
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.20
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.10
+
+  # ==========================================
+  # 模块2: AXI_BRIDGE (优先级P0)
+  # ==========================================
+  axi_bridge:
+    description: "AXI4总线桥接器"
+    priority: P0
+    targets:
+      code_coverage: 95.0
+      branch_coverage: 93.0
+      condition_coverage: 92.0
+      toggle_coverage: 90.0
+      fsm_coverage: 90.0
+      assertion_coverage: 98.0
+      functional_coverage: 92.0
+    
+    special:
+      - type: protocol_coverage
+        target: 100.0
+        description: "AXI协议合规性(必须100%)"
+      - type: error_coverage
+        target: 95.0
+        description: "错误响应覆盖率"
+    
+    weights:
+      code_coverage: 0.25
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.25
+
+  # ==========================================
+  # 模块3: NOC_ROUTER (优先级P0)
+  # ==========================================
+  noc_router:
+    description: "片上网络路由器"
+    priority: P0
+    targets:
+      code_coverage: 92.0
+      branch_coverage: 90.0
+      condition_coverage: 88.0
+      toggle_coverage: 85.0
+      fsm_coverage: 92.0
+      assertion_coverage: 95.0
+      functional_coverage: 88.0
+    
+    special:
+      - type: routing_algorithm_coverage
+        target: 95.0
+        description: "路由算法覆盖率"
+      - type: deadlock_coverage
+        target: 100.0
+        description: "死锁场景覆盖率(必须100%)"
+    
+    weights:
+      code_coverage: 0.25
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.25
+      assertion_coverage: 0.10
+
+  # ==========================================
+  # 模块4: INTERRUPT_CTRL (优先级P1)
+  # ==========================================
+  interrupt_ctrl:
+    description: "中断控制器"
+    priority: P1
+    targets:
+      code_coverage: 92.0
+      branch_coverage: 90.0
+      condition_coverage: 88.0
+      toggle_coverage: 85.0
+      fsm_coverage: 90.0
+      assertion_coverage: 92.0
+      functional_coverage: 88.0
+    
+    special:
+      - type: interrupt_coverage
+        target: 95.0
+        description: "中断向量覆盖率"
+      - type: priority_coverage
+        target: 100.0
+        description: "优先级配置覆盖率(必须100%)"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.20
+      condition_coverage: 0.10
+      toggle_coverage: 0.10
+      fsm_coverage: 0.20
+      assertion_coverage: 0.10
+
+  # ==========================================
+  # 模块5: TIMER (优先级P1)
+  # ==========================================
+  timer:
+    description: "定时器模块"
+    priority: P1
+    targets:
+      code_coverage: 95.0
+      branch_coverage: 92.0
+      condition_coverage: 90.0
+      toggle_coverage: 88.0
+      fsm_coverage: 90.0
+      assertion_coverage: 95.0
+      functional_coverage: 90.0
+    
+    special:
+      - type: prescaler_coverage
+        target: 95.0
+        description: "预分频配置覆盖率"
+    
+    weights:
+      code_coverage: 0.35
+      branch_coverage: 0.20
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.10
+
+  # ==========================================
+  # 模块6: UART (优先级P1)
+  # ==========================================
+  uart:
+    description: "UART串口"
+    priority: P1
+    targets:
+      code_coverage: 92.0
+      branch_coverage: 90.0
+      condition_coverage: 88.0
+      toggle_coverage: 85.0
+      fsm_coverage: 88.0
+      assertion_coverage: 92.0
+      functional_coverage: 85.0
+    
+    special:
+      - type: baudrate_coverage
+        target: 90.0
+        description: "波特率配置覆盖率"
+      - type: fifo_coverage
+        target: 95.0
+        description: "FIFO覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块7: SPI (优先级P1)
+  # ==========================================
+  spi:
+    description: "SPI控制器"
+    priority: P1
+    targets:
+      code_coverage: 90.0
+      branch_coverage: 88.0
+      condition_coverage: 85.0
+      toggle_coverage: 82.0
+      fsm_coverage: 85.0
+      assertion_coverage: 90.0
+      functional_coverage: 82.0
+    
+    special:
+      - type: mode_coverage
+        target: 100.0
+        description: "SPI模式覆盖率(必须100%)"
+      - type: chip_select_coverage
+        target: 95.0
+        description: "片选信号覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.15
+      fsm_coverage: 0.10
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块8: I2C (优先级P1)
+  # ==========================================
+  i2c:
+    description: "I2C控制器"
+    priority: P1
+    targets:
+      code_coverage: 90.0
+      branch_coverage: 88.0
+      condition_coverage: 85.0
+      toggle_coverage: 82.0
+      fsm_coverage: 85.0
+      assertion_coverage: 90.0
+      functional_coverage: 82.0
+    
+    special:
+      - type: address_coverage
+        target: 100.0
+        description: "地址匹配覆盖率(必须100%)"
+      - type: ack_coverage
+        target: 95.0
+        description: "ACK/NACK覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块9: GPIO (优先级P1)
+  # ==========================================
+  gpio:
+    description: "GPIO控制器"
+    priority: P1
+    targets:
+      code_coverage: 95.0
+      branch_coverage: 92.0
+      condition_coverage: 90.0
+      toggle_coverage: 88.0
+      fsm_coverage: 90.0
+      assertion_coverage: 95.0
+      functional_coverage: 90.0
+    
+    special:
+      - type: direction_coverage
+        target: 100.0
+        description: "方向配置覆盖率(必须100%)"
+      - type: interrupt_coverage
+        target: 95.0
+        description: "中断触发覆盖率"
+    
+    weights:
+      code_coverage: 0.35
+      branch_coverage: 0.20
+      condition_coverage: 0.10
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块10: WDT (优先级P1)
+  # ==========================================
+  wdt:
+    description: "看门狗定时器"
+    priority: P1
+    targets:
+      code_coverage: 98.0
+      branch_coverage: 95.0
+      condition_coverage: 93.0
+      toggle_coverage: 90.0
+      fsm_coverage: 92.0
+      assertion_coverage: 98.0
+      functional_coverage: 95.0
+    
+    special:
+      - type: reset_coverage
+        target: 100.0
+        description: "复位触发覆盖率(必须100%)"
+      - type: timeout_coverage
+        target: 95.0
+        description: "超时配置覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.20
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块11: PWM (优先级P2)
+  # ==========================================
+  pwm:
+    description: "PWM控制器"
+    priority: P2
+    targets:
+      code_coverage: 90.0
+      branch_coverage: 88.0
+      condition_coverage: 85.0
+      toggle_coverage: 82.0
+      fsm_coverage: 85.0
+      assertion_coverage: 90.0
+      functional_coverage: 82.0
+    
+    special:
+      - type: duty_cycle_coverage
+        target: 90.0
+        description: "占空比覆盖率"
+    
+    weights:
+      code_coverage: 0.35
+      branch_coverage: 0.20
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.10
+
+  # ==========================================
+  # 模块12: SAFETY_ISLAND (优先级P0, ASIL-D)
+  # ==========================================
+  safety_island:
+    description: "安全岛(ASIL-D)"
+    priority: P0
+    safety_level: ASIL-D
+    targets:
+      code_coverage: 98.0
+      branch_coverage: 96.0
+      condition_coverage: 95.0
+      toggle_coverage: 93.0
+      fsm_coverage: 95.0
+      assertion_coverage: 100.0
+      functional_coverage: 95.0
+    
+    special:
+      - type: lockstep_coverage
+        target: 100.0
+        description: "双核锁步覆盖率(必须100%)"
+      - type: ecc_coverage
+        target: 100.0
+        description: "ECC检测覆盖率(必须100%)"
+      - type: redundancy_coverage
+        target: 100.0
+        description: "冗余检查覆盖率(必须100%)"
+      - type: fault_injection_coverage
+        target: 95.0
+        description: "故障注入测试覆盖率"
+    
+    weights:
+      code_coverage: 0.20
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.15
+      fsm_coverage: 0.15
+      assertion_coverage: 0.20
+
+  # ==========================================
+  # 模块13: DMA (优先级P1)
+  # ==========================================
+  dma:
+    description: "DMA控制器"
+    priority: P1
+    targets:
+      code_coverage: 92.0
+      branch_coverage: 90.0
+      condition_coverage: 88.0
+      toggle_coverage: 85.0
+      fsm_coverage: 90.0
+      assertion_coverage: 95.0
+      functional_coverage: 88.0
+    
+    special:
+      - type: transfer_type_coverage
+        target: 100.0
+        description: "传输类型覆盖率(必须100%)"
+      - type: channel_coverage
+        target: 95.0
+        description: "通道配置覆盖率"
+      - type: error_coverage
+        target: 95.0
+        description: "错误处理覆盖率"
+    
+    weights:
+      code_coverage: 0.25
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.20
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块14: SRAM_CTRL (优先级P1)
+  # ==========================================
+  sram_ctrl:
+    description: "SRAM控制器"
+    priority: P1
+    targets:
+      code_coverage: 95.0
+      branch_coverage: 93.0
+      condition_coverage: 90.0
+      toggle_coverage: 88.0
+      fsm_coverage: 90.0
+      assertion_coverage: 98.0
+      functional_coverage: 92.0
+    
+    special:
+      - type: ecc_coverage
+        target: 100.0
+        description: "ECC覆盖率(必须100%)"
+      - type: latency_coverage
+        target: 90.0
+        description: "延迟配置覆盖率"
+    
+    weights:
+      code_coverage: 0.25
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.10
+      assertion_coverage: 0.25
+
+  # ==========================================
+  # 模块15: FLASH_CTRL (优先级P1)
+  # ==========================================
+  flash_ctrl:
+    description: "Flash控制器"
+    priority: P1
+    targets:
+      code_coverage: 90.0
+      branch_coverage: 88.0
+      condition_coverage: 85.0
+      toggle_coverage: 82.0
+      fsm_coverage: 85.0
+      assertion_coverage: 90.0
+      functional_coverage: 82.0
+    
+    special:
+      - type: command_coverage
+        target: 100.0
+        description: "命令集覆盖率(必须100%)"
+      - type: erase_coverage
+        target: 95.0
+        description: "擦除操作覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块16: CACHE_COH (优先级P1)
+  # ==========================================
+  cache_coh:
+    description: "缓存一致性模块"
+    priority: P1
+    targets:
+      code_coverage: 88.0
+      branch_coverage: 85.0
+      condition_coverage: 82.0
+      toggle_coverage: 80.0
+      fsm_coverage: 88.0
+      assertion_coverage: 92.0
+      functional_coverage: 85.0
+    
+    special:
+      - type: coherence_protocol_coverage
+        target: 100.0
+        description: "一致性协议覆盖率(必须100%)"
+      - type: snoop_coverage
+        target: 95.0
+        description: "监听操作覆盖率"
+    
+    weights:
+      code_coverage: 0.20
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.25
+      assertion_coverage: 0.15
+
+  # ==========================================
+  # 模块17: ERROR_INJECT (优先级P2)
+  # ==========================================
+  error_inject:
+    description: "错误注入模块"
+    priority: P2
+    targets:
+      code_coverage: 98.0
+      branch_coverage: 95.0
+      condition_coverage: 93.0
+      toggle_coverage: 90.0
+      fsm_coverage: 92.0
+      assertion_coverage: 98.0
+      functional_coverage: 95.0
+    
+    special:
+      - type: parity_error_coverage
+        target: 100.0
+        description: "奇偶校验错误覆盖率(必须100%)"
+      - type: ecc_error_coverage
+        target: 100.0
+        description: "ECC错误覆盖率(必须100%)"
+      - type: timeout_coverage
+        target: 95.0
+        description: "超时错误覆盖率"
+    
+    weights:
+      code_coverage: 0.25
+      branch_coverage: 0.15
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.20
+
+  # ==========================================
+  # 模块18: POWER_MGMT (优先级P2)
+  # ==========================================
+  power_mgmt:
+    description: "功耗管理模块"
+    priority: P2
+    targets:
+      code_coverage: 92.0
+      branch_coverage: 90.0
+      condition_coverage: 88.0
+      toggle_coverage: 85.0
+      fsm_coverage: 88.0
+      assertion_coverage: 95.0
+      functional_coverage: 88.0
+    
+    special:
+      - type: power_state_coverage
+        target: 100.0
+        description: "电源状态覆盖率(必须100%)"
+      - type: clock_gating_coverage
+        target: 95.0
+        description: "时钟门控覆盖率"
+    
+    weights:
+      code_coverage: 0.30
+      branch_coverage: 0.20
+      condition_coverage: 0.15
+      toggle_coverage: 0.10
+      fsm_coverage: 0.15
+      assertion_coverage: 0.10
+
+# ==========================================
+# 覆盖率检查规则
+# ==========================================
+check_rules:
+  # 门禁检查
+  gate_check:
+    enabled: true
+    fail_on_minimum_violation: true
+    warning_on_recommended_violation: true
+  
+  # 趋势检查
+  trend_check:
+    enabled: true
+    min_improvement_per_week: 0.5
+    max_regression_per_week: 2.0
+  
+  # 特殊检查
+  special_check:
+    enabled: true
+    fail_on_100_coverage_miss: true
+
+# ==========================================
+# 报告配置
+# ==========================================
+reporting:
+  formats:
+    - html
+    - pdf
+    - csv
+  
+  content:
+    - summary
+    - module_details
+    - trends
+    - gaps
+    - recommendations
+  
+  distribution:
+    - daily
+    - weekly
+    - monthly

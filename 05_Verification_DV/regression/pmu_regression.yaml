@@ -1,0 +1,81 @@
+name: pmu_regression
+description: PMU verification regression suite
+
+testsuites:
+  pmu_sanity:
+    tests:
+      - pmu_sanity_test
+    description: Quick smoke test for basic functionality
+    priority: P0
+    timeout: 3600
+    parallel_jobs: 8
+    pass_threshold: 100.0
+
+  pmu_power:
+    tests:
+      - pmu_power_test
+    description: Power domain control tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  pmu_dvfs:
+    tests:
+      - pmu_dvfs_test
+    description: DVFS and frequency/voltage scaling tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  pmu_low_power:
+    tests:
+      - pmu_low_power_test
+    description: Low power mode tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+  pmu_protection:
+    tests:
+      - pmu_protection_test
+    description: Protection mechanism tests
+    priority: P0
+    timeout: 7200
+    parallel_jobs: 4
+    pass_threshold: 100.0
+
+regression_settings:
+  seed: 23456
+  waves: false
+  coverage: true
+  log_level: DEBUG
+  uvm_verbosity: UVM_MEDIUM
+
+coverage_goals:
+  code_coverage:
+    requirement: 100.0
+    exclude: []
+  functional_coverage:
+    requirement: 95.0
+    coverpoints:
+      - op_type
+      - power_domain
+      - voltage_level
+      - frequency
+      - status
+
+targets:
+  sim:
+    tool: xcelium
+    args: -timescale 1ns/1ps
+
+  debug:
+    tool: xcelium
+    args: -timescale 1ns/1ps -gui
+
+  regress:
+    tool: xcelium
+    args: -timescale 1ns/1ps -coverage all

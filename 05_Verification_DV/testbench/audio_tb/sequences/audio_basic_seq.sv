@@ -1,0 +1,110 @@
+class audio_basic_seq extends uvm_sequence #(audio_transaction);
+    `uvm_object_utils(audio_basic_seq)
+    
+    function new(string name = "audio_basic_seq");
+        super.new(name);
+    endtask
+    
+    virtual task body();
+        repeat(1000) begin
+            audio_transaction tr;
+            tr = audio_transaction::type_id::create("tr");
+            
+            start_item(tr);
+            if(!tr.randomize() with { valid == 1; }) begin
+                `uvm_error("SEQ", "Randomization failed")
+            end
+            finish_item(tr);
+        end
+    endtask
+endclass
+
+class audio_i2s_seq extends uvm_sequence #(audio_transaction);
+    `uvm_object_utils(audio_i2s_seq)
+    
+    function new(string name = "audio_i2s_seq");
+        super.new(name);
+    endtask
+    
+    virtual task body();
+        for(int i = 0; i < 1000; i++) begin
+            audio_transaction tr;
+            tr = audio_transaction::type_id::create("tr");
+            
+            start_item(tr);
+            if(!tr.randomize() with { valid == 1; }) begin
+                `uvm_error("SEQ", "Randomization failed")
+            end
+            finish_item(tr);
+        end
+    endtask
+endclass
+
+class audio_pdm_seq extends uvm_sequence #(audio_transaction);
+    `uvm_object_utils(audio_pdm_seq)
+    
+    function new(string name = "audio_pdm_seq");
+        super.new(name);
+    endtask
+    
+    virtual task body();
+        for(int i = 0; i < 5000; i++) begin
+            audio_transaction tr;
+            tr = audio_transaction::type_id::create("tr");
+            
+            start_item(tr);
+            if(!tr.randomize() with { valid == 1; }) begin
+                `uvm_error("SEQ", "Randomization failed")
+            end
+            finish_item(tr);
+        end
+    endtask
+endclass
+
+class audio_error_seq extends uvm_sequence #(audio_transaction);
+    `uvm_object_utils(audio_error_seq)
+    
+    function new(string name = "audio_error_seq");
+        super.new(name);
+    endtask
+    
+    virtual task body();
+        for(int i = 0; i < 10; i++) begin
+            audio_transaction tr;
+            tr = audio_transaction::type_id::create("tr");
+            
+            start_item(tr);
+            if(!tr.randomize() with { valid == 0; }) begin
+                `uvm_error("SEQ", "Randomization failed")
+            end
+            finish_item(tr);
+        end
+    endtask
+endclass
+
+class audio_performance_seq extends uvm_sequence #(audio_transaction);
+    `uvm_object_utils(audio_performance_seq)
+    
+    function new(string name = "audio_performance_seq");
+        super.new(name);
+    endtask
+    
+    virtual task body();
+        time start_time, end_time;
+        
+        start_time = $time;
+        
+        repeat(100000) begin
+            audio_transaction tr;
+            tr = audio_transaction::type_id::create("tr");
+            start_item(tr);
+            if(!tr.randomize() with { valid == 1; }) begin
+                `uvm_error("SEQ", "Randomization failed")
+            end
+            finish_item(tr);
+        end
+        
+        end_time = $time;
+        `uvm_info("PERF", $sformatf("Audio Throughput Test Complete in %0t ns", end_time - start_time), UVM_LOW)
+    endtask
+endclass

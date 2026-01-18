@@ -1,0 +1,604 @@
+# YaoGuang SoC DV验证回归测试与覆盖率基础设施
+
+## 1. 主回归配置 (master_regression.yaml)
+
+```yaml
+# YaoGuang SoC 主回归测试配置
+# 用于定义所有回归测试套件、模块覆盖率和执行策略
+
+regression_suites:
+  # ==========================================
+  # Sanity回归 - 快速冒烟测试
+  # ==========================================
+  sanity:
+    description: "快速冒烟测试，验证基本功能"
+    priority: P0
+    timeout: 3600  # 秒
+    parallel_jobs: 8
+    pass_threshold: 100.0  # 必须100%通过
+    tests:
+      - name: cpu_isc_basic
+        module: cpu_isc
+        tier: smoke
+        timeout: 300
+      - name: axi_bridge_basic
+        module: axi_bridge
+        tier: smoke
+        timeout: 300
+      - name: interrupt_basic
+        module: interrupt_ctrl
+        tier: smoke
+        timeout: 300
+      - name: timer_basic
+        module: timer
+        tier: smoke
+        timeout: 300
+      - name: uart_basic
+        module: uart
+        tier: smoke
+        timeout: 300
+      - name: spi_basic
+        module: spi
+        tier: smoke
+        timeout: 300
+      - name: i2c_basic
+        module: i2c
+        tier: smoke
+        timeout: 300
+      - name: gpio_basic
+        module: gpio
+        tier: smoke
+        timeout: 300
+      - name: wdt_basic
+        module: wdt
+        tier: smoke
+        timeout: 300
+      - name: pwm_basic
+        module: pwm
+        tier: smoke
+        timeout: 300
+
+  # ==========================================
+  # Nightly回归 - 完整功能测试
+  # ==========================================
+  nightly:
+    description: "完整功能测试，每日执行"
+    priority: P1
+    timeout: 28800  # 8小时
+    parallel_jobs: 16
+    pass_threshold: 98.0
+    tests:
+      # CPU子系统测试
+      - name: cpu_isc_basic
+        module: cpu_isc
+        tier: smoke
+      - name: cpu_isc_arith
+        module: cpu_isc
+        tier: functional
+        timeout: 1800
+      - name: cpu_isc_logic
+        module: cpu_isc
+        tier: functional
+        timeout: 1800
+      - name: cpu_isc_mem
+        module: cpu_isc
+        tier: functional
+        timeout: 1800
+      - name: cpu_isc_intr
+        module: cpu_isc
+        tier: functional
+        timeout: 1200
+      
+      # 互联测试
+      - name: axi_bridge_basic
+        module: axi_bridge
+        tier: smoke
+      - name: axi_bridge_burst
+        module: axi_bridge
+        tier: functional
+        timeout: 2400
+      - name: axi_bridge_lock
+        module: axi_bridge
+        tier: functional
+        timeout: 1800
+      - name: noc_router_basic
+        module: noc_router
+        tier: functional
+        timeout: 2400
+      - name: noc_router_prio
+        module: noc_router
+        tier: functional
+        timeout: 1800
+      
+      # 外设测试
+      - name: interrupt_basic
+        module: interrupt_ctrl
+        tier: smoke
+      - name: interrupt_cascade
+        module: interrupt_ctrl
+        tier: functional
+        timeout: 1200
+      - name: interrupt_prio
+        module: interrupt_ctrl
+        tier: functional
+        timeout: 1200
+      - name: timer_basic
+        module: timer
+        tier: smoke
+      - name: timer_prescale
+        module: timer
+        tier: functional
+        timeout: 1200
+      - name: timer_cascade
+        module: timer
+        tier: functional
+        timeout: 1200
+      - name: uart_basic
+        module: uart
+        tier: smoke
+      - name: uart_baud
+        module: uart
+        tier: functional
+        timeout: 1800
+      - name: uart_fifo
+        module: uart
+        tier: functional
+        timeout: 1200
+      - name: spi_basic
+        module: spi
+        tier: smoke
+      - name: spi_mode
+        module: spi
+        tier: functional
+        timeout: 1800
+      - name: spi_fifo
+        module: spi
+        tier: functional
+        timeout: 1200
+      - name: i2c_basic
+        module: i2c
+        tier: smoke
+      - name: i2c_addr
+        module: i2c
+        tier: functional
+        timeout: 1800
+      - name: i2c_multi
+        module: i2c
+        tier: functional
+        timeout: 1200
+      - name: gpio_basic
+        module: gpio
+        tier: smoke
+      - name: gpio_intr
+        module: gpio
+        tier: functional
+        timeout: 1200
+      - name: gpio_debounce
+        module: gpio
+        tier: functional
+        timeout: 1200
+      - name: wdt_basic
+        module: wdt
+        tier: smoke
+      - name: wdt_reset
+        module: wdt
+        tier: functional
+        timeout: 1800
+      - name: pwm_basic
+        module: pwm
+        tier: smoke
+      - name: pwm_duty
+        module: pwm
+        tier: functional
+        timeout: 1200
+      
+      # 安全岛测试
+      - name: safety_island_basic
+        module: safety_island
+        tier: smoke
+        timeout: 1800
+      - name: safety_island_lockstep
+        module: safety_island
+        tier: functional
+        timeout: 2400
+      - name: safety_island_ecc
+        module: safety_island
+        tier: functional
+        timeout: 1800
+      
+      # DMA测试
+      - name: dma_basic
+        module: dma
+        tier: smoke
+      - name: dma_chain
+        module: dma
+        tier: functional
+        timeout: 2400
+      - name: dma_burst
+        module: dma
+        tier: functional
+        timeout: 1800
+      - name: dma_scatter
+        module: dma
+        tier: functional
+        timeout: 1800
+      
+      # 存储测试
+      - name: sram_ctrl_basic
+        module: sram_ctrl
+        tier: smoke
+      - name: sram_ctrl_ecc
+        module: sram_ctrl
+        tier: functional
+        timeout: 1800
+      - name: flash_ctrl_basic
+        module: flash_ctrl
+        tier: functional
+        timeout: 2400
+      - name: flash_ctrl_erase
+        module: flash_ctrl
+        tier: functional
+        timeout: 1800
+
+  # ==========================================
+  # Weekly回归 - 深度测试与压力测试
+  # ==========================================
+  weekly:
+    description: "深度功能测试、压力测试和边界条件测试"
+    priority: P2
+    timeout: 172800  # 48小时
+    parallel_jobs: 24
+    pass_threshold: 95.0
+    tests:
+      # 包含所有nightly测试
+      - {include: nightly}
+      
+      # 边界条件测试
+      - name: cpu_isc_boundary
+        module: cpu_isc
+        tier: stress
+        timeout: 3600
+      - name: axi_bridge_stress
+        module: axi_bridge
+        tier: stress
+        timeout: 3600
+      - name: noc_router_congest
+        module: noc_router
+        tier: stress
+        timeout: 3600
+      
+      # 长时间压力测试
+      - name: timer_stress
+        module: timer
+        tier: stress
+        timeout: 7200
+      - name: uart_stress
+        module: uart
+        tier: stress
+        timeout: 7200
+      - name: gpio_stress
+        module: gpio
+        tier: stress
+        timeout: 7200
+      
+      # 随机化深度测试
+      - name: cpu_isc_random
+        module: cpu_isc
+        tier: random
+        iterations: 1000
+        timeout: 5400
+      - name: axi_bridge_random
+        module: axi_bridge
+        tier: random
+        iterations: 1000
+        timeout: 5400
+      - name: interrupt_random
+        module: interrupt_ctrl
+        tier: random
+        iterations: 500
+        timeout: 3600
+      - name: dma_random
+        module: dma
+        tier: random
+        iterations: 500
+        timeout: 5400
+      
+      # 一致性测试
+      - name: coherence_basic
+        module: cache_coh
+        tier: functional
+        timeout: 3600
+      - name: coherence_snoop
+        module: cache_coh
+        tier: stress
+        timeout: 5400
+      
+      # 错误注入测试
+      - name: error_inject_parity
+        module: error_inject
+        tier: error
+        timeout: 2400
+      - name: error_inject_ecc
+        module: error_inject
+        tier: error
+        timeout: 2400
+      - name: error_inject_timeout
+        module: error_inject
+        tier: error
+        timeout: 1800
+      
+      # 功耗相关测试
+      - name: power_gating_basic
+        module: power_mgmt
+        tier: functional
+        timeout: 2400
+      - name: power_clock_gating
+        module: power_mgmt
+        tier: functional
+        timeout: 1800
+
+  # ==========================================
+  # Full回归 - 所有测试(发布前使用)
+  # ==========================================
+  full:
+    description: "完整回归测试，包含所有测试用例"
+    priority: P3
+    timeout: 604800  # 168小时(7天)
+    parallel_jobs: 32
+    pass_threshold: 90.0
+    tests:
+      - {include: weekly}
+      
+      # 长期稳定性测试
+      - name: soak_test_24h
+        module: system
+        tier: soak
+        timeout: 86400
+      - name: soak_test_48h
+        module: system
+        tier: soak
+        timeout: 172800
+      
+      # 互操作性测试
+      - name: interop_dma_uart
+        modules: [dma, uart]
+        tier: interop
+        timeout: 3600
+      - name: interop_spi_gpio
+        modules: [spi, gpio]
+        tier: interop
+        timeout: 3600
+      - name: interop_timer_intr
+        modules: [timer, interrupt_ctrl]
+        tier: interop
+        timeout: 3600
+      
+      # 回归测试(用于验证修复)
+      - name: regression_basic
+        module: all
+        tier: regression
+        timeout: 7200
+
+# ==========================================
+# 模块配置
+# ==========================================
+modules:
+  cpu_isc:
+    description: "CPU指令集控制器"
+    tests_dir: tests/cpu_isc
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - fsm
+      - toggle
+      - branch
+      - assertion
+  
+  axi_bridge:
+    description: "AXI总线桥接器"
+    tests_dir: tests/axi_bridge
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - assertion
+  
+  noc_router:
+    description: "NoC路由器"
+    tests_dir: tests/noc_router
+    sim_tool: vcs
+    waves: false
+    coverage:
+      - code
+      - fsm
+      - assertion
+  
+  interrupt_ctrl:
+    description: "中断控制器"
+    tests_dir: tests/interrupt_ctrl
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - fsm
+  
+  timer:
+    description: "定时器模块"
+    tests_dir: tests/timer
+    sim_tool: vcs
+    waves: false
+    coverage:
+      - code
+  
+  uart:
+    description: "UART串口"
+    tests_dir: tests/uart
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - assertion
+  
+  spi:
+    description: "SPI控制器"
+    tests_dir: tests/spi
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+  
+  i2c:
+    description: "I2C控制器"
+    tests_dir: tests/i2c
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+  
+  gpio:
+    description: "GPIO控制器"
+    tests_dir: tests/gpio
+    sim_tool: vcs
+    waves: false
+    coverage:
+      - code
+  
+  wdt:
+    description: "看门狗定时器"
+    tests_dir: tests/wdt
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+  
+  pwm:
+    description: "PWM控制器"
+    tests_dir: tests/pwm
+    sim_tool: vcs
+    waves: false
+    coverage:
+      - code
+  
+  safety_island:
+    description: "安全岛(ASIL-D)"
+    tests_dir: tests/safety_island
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - fsm
+      - toggle
+      - assertion
+  
+  dma:
+    description: "DMA控制器"
+    tests_dir: tests/dma
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - fsm
+  
+  sram_ctrl:
+    description: "SRAM控制器"
+    tests_dir: tests/sram_ctrl
+    sim_tool: vcs
+    waves: false
+    coverage:
+      - code
+      - ecc
+  
+  flash_ctrl:
+    description: "Flash控制器"
+    tests_dir: tests/flash_ctrl
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+  
+  cache_coh:
+    description: "缓存一致性模块"
+    tests_dir: tests/cache_coh
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+      - fsm
+      - assertion
+  
+  error_inject:
+    description: "错误注入模块"
+    tests_dir: tests/error_inject
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+  
+  power_mgmt:
+    description: "功耗管理模块"
+    tests_dir: tests/power_mgmt
+    sim_tool: vcs
+    waves: true
+    coverage:
+      - code
+
+# ==========================================
+# 执行配置
+# ==========================================
+execution:
+  sim_tool: vcs
+  sim_version: "2023.03"
+  waves: auto  # auto/always/never
+  max_parallel_jobs: 32
+  default_timeout: 3600
+  email_on_failure: true
+  failure_notification:
+    - yaoguang-dv-team@company.com
+    - yaoguang-project-manager@company.com
+  
+  # 覆盖率配置
+  coverage:
+    tool: urg
+    type:
+      - line
+      - branch
+      - condition
+      - toggle
+      - fsm
+      - assertion
+    merge_format: "merged"
+    report_format: "html"
+  
+  # 资源限制
+  resources:
+    max_memory: 64GB
+    max_cores: 128
+    timeout_grace: 300  # 额外超时时间
+  
+  # 重试配置
+  retry:
+    enabled: true
+    max_attempts: 2
+    delay: 60  # 秒
+
+# ==========================================
+# 报告配置
+# ==========================================
+reporting:
+  output_dir: coverage_reports/regression
+  report_template: regression_report_template.md
+  
+  # 图表配置
+  charts:
+    - pass_rate_trend
+    - coverage_trend
+    - module_comparison
+    - failure_distribution
+  
+  # 数据库配置
+  database:
+    type: influxdb
+    url: "http://dv-metrics:8086"
+    database: yaoguang_dv
+    retention: 90d

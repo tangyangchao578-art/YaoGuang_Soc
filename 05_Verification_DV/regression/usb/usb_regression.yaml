@@ -1,0 +1,51 @@
+name: usb_regression
+description: USB Controller Regression Suite
+
+testlist:
+  - name: usb_basic_test
+    description: USB basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42, 123]
+    
+  - name: usb_bulk_test
+    description: USB bulk transfer test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: usb_control_test
+    description: USB control transfer test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: usb_error_test
+    description: USB error handling test
+    type: error
+    priority: P1
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: usb_crc_err_test
+    description: USB CRC error detection test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: usb_performance_test
+    description: USB throughput performance test
+    type: performance
+    priority: P2
+    timeout: 1000ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%

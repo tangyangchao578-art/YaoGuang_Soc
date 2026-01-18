@@ -1,0 +1,33 @@
+`ifndef NPU_CLUSTER_CONFIG_SV
+`define NPU_CLUSTER_CONFIG_SV
+
+class npu_cluster_env_config extends uvm_object;
+    `uvm_object_utils(npu_cluster_env_config)
+
+    bit                 is_active;
+    bit                 has_scoreboard;
+    bit                 has_coverage;
+    virtual npu_cluster_if vif;
+
+    function new(string name = "npu_cluster_env_config");
+        super.new(name);
+        is_active = 1;
+        has_scoreboard = 1;
+        has_coverage = 1;
+    endfunction
+endclass
+
+class npu_cluster_agent_config extends uvm_object;
+    `uvm_object_utils(npu_cluster_agent_config)
+
+    bit     is_active;
+    int     num_transactions;
+
+    function new(string name = "npu_cluster_agent_config");
+        super.new(name);
+        is_active = 1;
+        num_transactions = 100;
+    endfunction
+endclass
+
+`endif

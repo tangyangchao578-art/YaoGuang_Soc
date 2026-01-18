@@ -1,0 +1,107 @@
+# CPU Subsystem Regression Configuration
+# YaoGuang SoC DV Team
+# Date: 2026-01-18
+
+name: cpu_subsystem_regression
+description: CPU Subsystem verification regression suite
+
+test_suites:
+  - name: cpu_instruction_test
+    description: CPU instruction execution test
+    test: cpu_instruction_test
+    timeout: 3600
+    priority: P0
+    parallel_jobs: 4
+    pass_threshold: 100.0
+    coverage_target:
+      line: 95
+      branch: 90
+      toggle: 95
+      condition: 95
+      fsm: 90
+
+  - name: cpu_cache_test
+    description: CPU cache operations test
+    test: cpu_cache_test
+    timeout: 3600
+    priority: P0
+    parallel_jobs: 4
+    pass_threshold: 100.0
+    coverage_target:
+      line: 95
+      branch: 90
+      toggle: 95
+      condition: 95
+      fsm: 90
+
+  - name: cpu_interrupt_test
+    description: CPU interrupt handling test
+    test: cpu_interrupt_test
+    timeout: 3600
+    priority: P0
+    parallel_jobs: 4
+    pass_threshold: 100.0
+    coverage_target:
+      line: 95
+      branch: 90
+      toggle: 95
+      condition: 95
+      fsm: 90
+
+  - name: cpu_performance_test
+    description: CPU performance test
+    test: cpu_performance_test
+    timeout: 7200
+    priority: P1
+    parallel_jobs: 2
+    pass_threshold: 100.0
+    coverage_target:
+      line: 90
+      branch: 85
+      toggle: 90
+      condition: 90
+      fsm: 85
+
+  - name: cpu_reset_test
+    description: CPU reset test
+    test: cpu_reset_test
+    timeout: 1800
+    priority: P1
+    parallel_jobs: 4
+    pass_threshold: 100.0
+    coverage_target:
+      line: 90
+      branch: 85
+      toggle: 90
+      condition: 90
+      fsm: 85
+
+regression_settings:
+  max_failures: 10
+  abort_on_failure: false
+  generate_waveform: false
+  coverage_merge: true
+  log_level: UVM_LOW
+
+global_config:
+  num_cores: 4
+  l1_cache_size: 32
+  l2_cache_size: 256
+  enable_coverage: true
+  enable_debug: false
+
+targets:
+  - name: sim
+    simulator: vcs
+    compile_options: "-full64 -sverilog -ntb_opts uvm-1.2"
+    run_options: "+ntb_random_seed=auto"
+
+  - name: xcelium
+    simulator: xcelium
+    compile_options: "-full64 -sverilog -uvm"
+    run_options: "-seed auto"
+
+  - name: questa
+    simulator: questa
+    compile_options: "-64 -sv -cover bst"
+    run_options: "-c -do \"run -all\""

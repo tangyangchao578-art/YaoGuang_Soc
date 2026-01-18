@@ -1,0 +1,288 @@
+# YaoGuang SoC 持续集成配置
+# 用于自动化DV回归测试和覆盖率收集
+
+# 全局变量
+variables:
+  GIT_STRATEGY: fetch
+  GIT_CHECKOUT: "true"
+  
+  # 仿真工具配置
+  SIM_TOOL: vcs
+  SIM_VERSION: "2023.03"
+  
+  # 覆盖率配置
+  COVERAGE_TYPES: "line,branch,condition,toggle,fsm,assertion"
+  COVERAGE_TARGET: "95.0"
+  
+  # 执行配置
+  MAX_PARALLEL_JOBS: "16"
+  DEFAULT_TIMEOUT: "3600"
+  
+  # 报告配置
+  ARTIFACTS_DIR: "coverage_reports"
+  REPORTS_DIR: "reports"
+
+# ==========================================
+# Stages定义
+# ==========================================
+stages:
+  - sanity
+  - nightly
+  - weekly
+  - full
+  - coverage
+  - report
+
+# ==========================================
+# Sanity回归 - 每次提交触发
+# ==========================================
+sanity_check:
+  stage: sanity
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Running Sanity Regression..."
+    - python3 regression/run_regression.py --suite sanity --parallel 8 --retry 1
+  artifacts:
+    paths:
+      - coverage_reports/sanity/
+      - logs/
+    expire_in: 1 day
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_TAG
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+  tags:
+    - dv
+    - vcs
+  timeout: 2 hours
+
+# ==========================================
+# Nightly回归 - 每日触发
+# ==========================================
+nightly_regression:
+  stage: nightly
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Running Nightly Regression..."
+    - python3 regression/run_regression.py --suite nightly --parallel 16 --retry 2
+  artifacts:
+    paths:
+      - coverage_reports/nightly/
+      - logs/
+      - reports/
+    expire_in: 7 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: $CI_SCHEDULER_JOB_NAME == "nightly"
+  tags:
+    - dv
+    - vcs
+  timeout: 8 hours
+
+# ==========================================
+# Weekly回归 - 每周触发
+# ==========================================
+weekly_regression:
+  stage: weekly
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Running Weekly Regression..."
+    - python3 regression/run_regression.py --suite weekly --parallel 24 --retry 2
+  artifacts:
+    paths:
+      - coverage_reports/weekly/
+      - logs/
+      - reports/
+    expire_in: 30 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: $CI_SCHEDULER_JOB_NAME == "weekly"
+  tags:
+    - dv
+    - vcs
+  timeout: 48 hours
+
+# ==========================================
+# Full回归 - 发布前触发
+# ==========================================
+full_regression:
+  stage: full
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Running Full Regression..."
+    - python3 regression/run_regression.py --suite full --parallel 32 --retry 2
+  artifacts:
+    paths:
+      - coverage_reports/full/
+      - logs/
+      - reports/
+      - **/*.vcd
+      - **/*.fsdb
+    expire_in: 90 days
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/
+  tags:
+    - dv
+    - vcs
+    - high-memory
+  timeout: 168 hours
+  resources:
+    requests:
+      memory: 64GB
+      cpus: 64
+
+# ==========================================
+# 覆盖率收集与分析
+# ==========================================
+coverage_analysis:
+  stage: coverage
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Analyzing Coverage..."
+    - |
+      # 合并所有覆盖率数据库
+      urg -dir *.vdb -report coverage_reports/final -format both -metric hierarchy
+    - |
+      # 生成覆盖率报告
+      python3 scripts/generate_coverage_report.py --input coverage_reports/final --output coverage_reports/coverage_summary.html
+    - |
+      # 检查覆盖率门禁
+      python3 scripts/check_coverage_threshold.py --target 95.0
+  artifacts:
+    paths:
+      - coverage_reports/final/
+      - coverage_reports/coverage_summary.html
+    expire_in: 90 days
+  needs:
+    - job: full_regression
+      optional: true
+  tags:
+    - dv
+    - vcs
+  timeout: 4 hours
+
+# ==========================================
+# 覆盖率门禁检查
+# ==========================================
+coverage_gate:
+  stage: coverage
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Checking Coverage Gates..."
+    - |
+      # 代码覆盖率检查
+      python3 scripts/check_coverage_gate.py --type code --target 95.0 --actual $(cat coverage_reports/final/code_coverage.txt)
+    - |
+      # 功能覆盖率检查
+      python3 scripts/check_coverage_gate.py --type functional --target 90.0 --actual $(cat coverage_reports/final/functional_coverage.txt)
+    - |
+      # 断言覆盖率检查
+      python3 scripts/check_coverage_gate.py --type assertion --target 95.0 --actual $(cat coverage_reports/final/assertion_coverage.txt)
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: manual
+  tags:
+    - dv
+  timeout: 1 hour
+
+# ==========================================
+# 报告生成与发布
+# ==========================================
+generate_report:
+  stage: report
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Generating Regression Report..."
+    - |
+      python3 scripts/generate_regression_report.py \
+        --suite nightly \
+        --input coverage_reports/nightly \
+        --output reports/regression_report_nightly.md \
+        --template regression/regression_report_template.md
+    - |
+      # 生成HTML版本
+      pandoc reports/regression_report_nightly.md -o reports/regression_report_nightly.html
+  artifacts:
+    paths:
+      - reports/
+    expire_in: 30 days
+  needs:
+    - job: nightly_regression
+  tags:
+    - dv
+  timeout: 30 minutes
+
+# ==========================================
+# 趋势分析
+# ==========================================
+trend_analysis:
+  stage: report
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - echo "Running Trend Analysis..."
+    - |
+      python3 scripts/trend_analysis.py \
+        --database "influxdb://dv-metrics:8086/yaoguang_dv" \
+        --output reports/trend_analysis.html
+    - |
+      # 上传趋势数据到数据库
+      python3 scripts/upload_trends.py --input reports/trend_analysis.json
+  artifacts:
+    paths:
+      - reports/trend_*.html
+    expire_in: 90 days
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  tags:
+    - dv
+    - analytics
+  timeout: 1 hour
+
+# ==========================================
+# 邮件通知
+# ==========================================
+notification:
+  stage: report
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - |
+      # 发送回归测试结果邮件
+      python3 scripts/send_notification.py \
+        --pipeline-id $CI_PIPELINE_ID \
+        --status $(cat status.txt) \
+        --recipients "yaoguang-dv-team@company.com,yaoguang-pm@company.com"
+    - |
+      # 发送失败告警
+      if [ $(cat failures.txt) -gt 0 ]; then
+        python3 scripts/send_alert.py \
+          --severity warning \
+          --message "Regression failed: $(cat failures) tests failed" \
+          --recipients "yaoguang-dv-team@company.com"
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+      when: always
+  tags:
+    - dv
+  timeout: 10 minutes
+
+# ==========================================
+# 清理任务
+# ==========================================
+cleanup:
+  stage: .post
+  image: yaoguang/dv-env:vcs-2023.03
+  script:
+    - |
+      # 清理旧的覆盖率数据库
+      find . -name "*.vdb" -mtime +30 -delete
+    - |
+      # 清理旧的日志文件
+      find logs -name "*.log" -mtime +7 -delete
+    - |
+      # 清理临时文件
+      rm -rf simv.* DVEfiles
+  when: manual
+  tags:
+    - dv
+  timeout: 30 minutes

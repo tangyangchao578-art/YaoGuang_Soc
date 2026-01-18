@@ -1,0 +1,46 @@
+name: mem_ctrl_regression
+description: Memory Controller Regression Suite
+
+testlist:
+  - name: mem_ctrl_basic_test
+    description: Memory basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42, 123]
+    
+  - name: mem_ctrl_ddr_test
+    description: DDR4/DDR5 memory access test
+    type: sanity
+    priority: P0
+    timeout: 200ms
+    seeds: [0, 42]
+    
+  - name: mem_ctrl_burst_test
+    description: Memory burst transfer test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: mem_ctrl_error_test
+    description: Memory error handling test
+    type: error
+    priority: P1
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: mem_ctrl_performance_test
+    description: Memory throughput performance test
+    type: performance
+    priority: P2
+    timeout: 1000ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%
+  - name: asil_coverage
+    goal: 100%

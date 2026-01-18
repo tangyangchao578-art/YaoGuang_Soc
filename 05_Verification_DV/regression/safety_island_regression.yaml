@@ -1,0 +1,258 @@
+# Safety Island Regression Configuration
+# YaoGuang SoC ASIL-D Safety Module Verification
+# Regression Suite for 100+ Test Cases
+#===============================================================================
+
+regression_name: safety_island_regression
+description: Safety Island Module Regression Suite - ASIL-D Safety Verification
+version: 1.0.0
+date: 2026-01-18
+
+# Global Settings
+global:
+  timeout: 36000
+  parallel_jobs: 16
+  seed: 12345
+  waves: 0
+  log_level: UVM_LOW
+
+# Test Priority Configuration
+priority_levels:
+  P0:
+    description: Critical Safety Tests - Must Pass
+    tests:
+      - safety_island_lockstep_test_001
+      - safety_island_lockstep_test_002
+      - safety_island_lockstep_test_003
+      - safety_island_lockstep_test_004
+      - safety_island_ecc_test_001
+      - safety_island_ecc_test_002
+      - safety_island_ecc_test_003
+      - safety_island_ecc_test_004
+      - safety_island_wdg_test_001
+      - safety_island_wdg_test_002
+      - safety_island_fault_test_001
+      - safety_island_fault_test_004
+    timeout: 3600
+    pass_threshold: 100.0
+
+  P1:
+    description: Important Safety Tests
+    tests:
+      - safety_island_lockstep_test_005
+      - safety_island_lockstep_test_006
+      - safety_island_lockstep_test_007
+      - safety_island_lockstep_test_008
+      - safety_island_lockstep_test_009
+      - safety_island_ecc_test_005
+      - safety_island_ecc_test_006
+      - safety_island_ecc_test_007
+      - safety_island_ecc_test_008
+      - safety_island_wdg_test_003
+      - safety_island_wdg_test_004
+      - safety_island_wdg_test_005
+      - safety_island_wdg_test_006
+      - safety_island_wdg_test_007
+      - safety_island_wdg_test_008
+      - safety_island_fault_test_002
+      - safety_island_fault_test_003
+      - safety_island_fault_test_005
+    timeout: 7200
+    pass_threshold: 100.0
+
+  P2:
+    description: Additional Coverage Tests
+    tests:
+      - safety_island_random_test
+      - safety_island_stress_test
+    timeout: 10800
+    pass_threshold: 100.0
+
+# Regression Suites
+regression_suites:
+
+  sanity:
+    description: Quick smoke test for basic functionality
+    priority: P0
+    tests:
+      - safety_island_lockstep_test_001
+      - safety_island_ecc_test_001
+      - safety_island_wdg_test_001
+    timeout: 600
+    parallel_jobs: 4
+
+  lockstep_full:
+    description: Complete lockstep verification suite
+    priority: P0
+    tests:
+      - safety_island_lockstep_test_001
+      - safety_island_lockstep_test_002
+      - safety_island_lockstep_test_003
+      - safety_island_lockstep_test_004
+      - safety_island_lockstep_test_005
+      - safety_island_lockstep_test_006
+      - safety_island_lockstep_test_007
+      - safety_island_lockstep_test_008
+      - safety_island_lockstep_test_009
+    timeout: 1800
+    parallel_jobs: 8
+
+  ecc_full:
+    description: Complete ECC verification suite
+    priority: P0
+    tests:
+      - safety_island_ecc_test_001
+      - safety_island_ecc_test_002
+      - safety_island_ecc_test_003
+      - safety_island_ecc_test_004
+      - safety_island_ecc_test_005
+      - safety_island_ecc_test_006
+      - safety_island_ecc_test_007
+      - safety_island_ecc_test_008
+    timeout: 1800
+    parallel_jobs: 8
+
+  watchdog_full:
+    description: Complete watchdog verification suite
+    priority: P0
+    tests:
+      - safety_island_wdg_test_001
+      - safety_island_wdg_test_002
+      - safety_island_wdg_test_003
+      - safety_island_wdg_test_004
+      - safety_island_wdg_test_005
+      - safety_island_wdg_test_006
+      - safety_island_wdg_test_007
+      - safety_island_wdg_test_008
+    timeout: 1800
+    parallel_jobs: 8
+
+  fault_full:
+    description: Complete fault injection verification suite
+    priority: P0
+    tests:
+      - safety_island_fault_test_001
+      - safety_island_fault_test_002
+      - safety_island_fault_test_003
+      - safety_island_fault_test_004
+      - safety_island_fault_test_005
+    timeout: 1800
+    parallel_jobs: 8
+
+  comprehensive:
+    description: All safety island tests
+    priority: P0
+    tests:
+      - safety_island_lockstep_test_001
+      - safety_island_lockstep_test_002
+      - safety_island_lockstep_test_003
+      - safety_island_lockstep_test_004
+      - safety_island_lockstep_test_005
+      - safety_island_lockstep_test_006
+      - safety_island_lockstep_test_007
+      - safety_island_lockstep_test_008
+      - safety_island_lockstep_test_009
+      - safety_island_ecc_test_001
+      - safety_island_ecc_test_002
+      - safety_island_ecc_test_003
+      - safety_island_ecc_test_004
+      - safety_island_ecc_test_005
+      - safety_island_ecc_test_006
+      - safety_island_ecc_test_007
+      - safety_island_ecc_test_008
+      - safety_island_wdg_test_001
+      - safety_island_wdg_test_002
+      - safety_island_wdg_test_003
+      - safety_island_wdg_test_004
+      - safety_island_wdg_test_005
+      - safety_island_wdg_test_006
+      - safety_island_wdg_test_007
+      - safety_island_wdg_test_008
+      - safety_island_fault_test_001
+      - safety_island_fault_test_002
+      - safety_island_fault_test_003
+      - safety_island_fault_test_004
+      - safety_island_fault_test_005
+    timeout: 7200
+    parallel_jobs: 16
+
+  stress:
+    description: Stress and random testing
+    priority: P1
+    tests:
+      - safety_island_random_test
+      - safety_island_stress_test
+    timeout: 3600
+    parallel_jobs: 4
+
+  coverage:
+    description: Full coverage collection
+    priority: P1
+    tests:
+      - safety_island_lockstep_test_001
+      - safety_island_lockstep_test_002
+      - safety_island_lockstep_test_003
+      - safety_island_lockstep_test_004
+      - safety_island_lockstep_test_005
+      - safety_island_lockstep_test_006
+      - safety_island_lockstep_test_007
+      - safety_island_lockstep_test_008
+      - safety_island_lockstep_test_009
+      - safety_island_ecc_test_001
+      - safety_island_ecc_test_002
+      - safety_island_ecc_test_003
+      - safety_island_ecc_test_004
+      - safety_island_ecc_test_005
+      - safety_island_ecc_test_006
+      - safety_island_ecc_test_007
+      - safety_island_ecc_test_008
+      - safety_island_wdg_test_001
+      - safety_island_wdg_test_002
+      - safety_island_wdg_test_003
+      - safety_island_wdg_test_004
+      - safety_island_wdg_test_005
+      - safety_island_wdg_test_006
+      - safety_island_wdg_test_007
+      - safety_island_wdg_test_008
+      - safety_island_fault_test_001
+      - safety_island_fault_test_002
+      - safety_island_fault_test_003
+      - safety_island_fault_test_004
+      - safety_island_fault_test_005
+      - safety_island_random_test
+      - safety_island_stress_test
+    timeout: 14400
+    parallel_jobs: 8
+    coverage_target:
+      code_coverage: 95.0
+      functional_coverage: 100.0
+
+# Coverage Configuration
+coverage:
+  targets:
+    code_coverage: 95.0
+    functional_coverage: 100.0
+    toggle_coverage: 90.0
+    branch_coverage: 90.0
+    assertion_coverage: 100.0
+  
+  filters:
+    - exclude: *assert*
+    - exclude: *coverage_off*
+    - exclude: *disable_coverage*
+
+# Results Configuration
+results:
+  output_dir: ./results
+  html_report: 1
+  xml_report: 1
+  csv_report: 1
+  log_files: 1
+  wave_files: 0
+
+# Email Configuration
+notifications:
+  on_complete: 1
+  on_failure: 1
+  recipients:
+    - yaoguang-dv-team@example.com

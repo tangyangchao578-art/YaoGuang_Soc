@@ -1,0 +1,74 @@
+name: ethernet_regression
+description: Ethernet Controller Regression Suite
+
+testlist:
+  - name: ethernet_basic_test
+    description: Ethernet basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42, 123]
+    
+  - name: ethernet_frame_test
+    description: Ethernet frame transmission test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: ethernet_mdio_test
+    description: Ethernet MDIO access test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: ethernet_error_test
+    description: Ethernet error handling test
+    type: error
+    priority: P1
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: ethernet_crc_err_test
+    description: Ethernet CRC error detection test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: ethernet_frag_test
+    description: Ethernet fragment test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: ethernet_jumbo_test
+    description: Ethernet jumbo frame test
+    type: error
+    priority: P1
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: ethernet_performance_test
+    description: Ethernet throughput performance test
+    type: performance
+    priority: P2
+    timeout: 1000ms
+    seeds: [0]
+    
+  - name: ethernet_line_rate_test
+    description: Ethernet line rate test
+    type: performance
+    priority: P2
+    timeout: 500ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%
+  - name: toggle_coverage
+    goal: 90%

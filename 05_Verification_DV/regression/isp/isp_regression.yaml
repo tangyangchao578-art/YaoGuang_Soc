@@ -1,0 +1,44 @@
+name: isp_regression
+description: ISP Controller Regression Suite
+
+testlist:
+  - name: isp_basic_test
+    description: ISP basic functionality test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0, 42]
+    
+  - name: isp_demosaic_test
+    description: ISP demosaic processing test
+    type: sanity
+    priority: P0
+    timeout: 200ms
+    seeds: [0]
+    
+  - name: isp_awb_test
+    description: ISP AWB processing test
+    type: sanity
+    priority: P0
+    timeout: 100ms
+    seeds: [0]
+    
+  - name: isp_error_test
+    description: ISP error handling test
+    type: error
+    priority: P1
+    timeout: 50ms
+    seeds: [0]
+    
+  - name: isp_performance_test
+    description: ISP throughput performance test
+    type: performance
+    priority: P2
+    timeout: 1000ms
+    seeds: [0]
+
+coverage_goals:
+  - name: code_coverage
+    goal: 100%
+  - name: functional_coverage
+    goal: 95%
