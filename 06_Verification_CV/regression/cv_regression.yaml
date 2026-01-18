@@ -1,0 +1,297 @@
+# YaoGuang SoC CV Regression Configuration
+# Level: CV Verification Architect
+# Date: 2026-01-18
+
+###############################################################################
+# Regression Levels Configuration
+###############################################################################
+regression_levels:
+  sanity:
+    description: "Sanity regression - basic boot and critical functionality"
+    timeout: 3600
+    parallel_jobs: 4
+    pass_rate_threshold: 100.0
+    tests:
+      - cv_boot_basic
+      - cv_ddr_init
+      - cv_uart_hello_world
+      - cv_gpio_led_test
+
+  daily:
+    description: "Daily regression - extended functionality tests"
+    timeout: 7200
+    parallel_jobs: 8
+    pass_rate_threshold: 95.0
+    tests:
+      - include: sanity
+      - cv_boot_multi_stage
+      - cv_ddr_stress
+      - cv_spi_flash_test
+      - cv_i2c_sensor_test
+      - cv_pwm_led_control
+      - cv_timer_interrupt
+      - cv_watchdog_reset
+
+  weekly:
+    description: "Weekly regression - comprehensive feature verification"
+    timeout: 14400
+    parallel_jobs: 16
+    pass_rate_threshold: 90.0
+    tests:
+      - include: daily
+      - cv_ddr_bandwidth
+      - cv_ddr_latency
+      - cv_cache_coherency
+      - cv_bus_arbiter
+      - cv_dma_transfer
+      - cv_interrupt_controller
+      - cv_ethernet_basic
+      - cv_usb_host_test
+      - cv_can_bus_test
+
+  full:
+    description: "Full regression - all CV tests including performance"
+    timeout: 43200
+    parallel_jobs: 32
+    pass_rate_threshold: 85.0
+    tests:
+      - include: weekly
+      - cv_performance_ddr_throughput
+      - cv_performance_cache_hit_rate
+      - cv_performance_bus_bw
+      - cv_stress_memory
+      - cv_stress_interrupt
+      - cv_stress_dma
+      - cv_regression_stress
+      - cv_boot_robustness
+      - cv_power_management
+      - cv_thermal_test
+
+###############################################################################
+# Test Configuration
+###############################################################################
+test_config:
+  boot_tests:
+    - name: cv_boot_basic
+      type: c_test
+      category: boot
+      priority: P0
+      timeout: 300
+      description: "Basic boot ROM and primary bootloader test"
+      dependencies: []
+    - name: cv_boot_multi_stage
+      type: c_test
+      category: boot
+      priority: P1
+      timeout: 600
+      description: "Multi-stage boot process verification"
+      dependencies: [cv_boot_basic]
+    - name: cv_boot_robustness
+      type: c_test
+      category: boot
+      priority: P2
+      timeout: 900
+      description: "Boot sequence robustness under various conditions"
+      dependencies: [cv_boot_multi_stage]
+
+  ddr_tests:
+    - name: cv_ddr_bandwidth
+      type: c_test
+      category: ddr
+      priority: P1
+      timeout: 1800
+      description: "DDR memory bandwidth measurement"
+      dependencies: [cv_ddr_stress]
+    - name: cv_ddr_latency
+      type: c_test
+      category: ddr
+      priority: P1
+      timeout: 1800
+      description: "DDR memory latency measurement"
+      dependencies: [cv_ddr_stress]
+    - name: cv_ddr_latency
+      type: c_test
+      category: ddr
+      priority: P1
+      timeout: 1800
+      description: "DDR memory latency measurement"
+      dependencies: [cv_ddr_stress]
+
+  peripheral_tests:
+    - name: cv_uart_hello_world
+      type: c_test
+      category: peripherals
+      priority: P0
+      timeout: 300
+      description: "UART basic communication test"
+      dependencies: []
+    - name: cv_gpio_led_test
+      type: c_test
+      category: peripherals
+      priority: P0
+      timeout: 300
+      description: "GPIO output control test"
+      dependencies: []
+    - name: cv_spi_flash_test
+      type: c_test
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "SPI flash read/write/erase test"
+      dependencies: []
+    - name: cv_i2c_sensor_test
+      type: c_test
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "I2C sensor communication test"
+      dependencies: []
+    - name: cv_pwm_led_control
+      type: c_test
+      category: peripherals
+      priority: P2
+      timeout: 600
+      description: "PWM LED brightness control test"
+      dependencies: []
+    - name: cv_timer_interrupt
+      type: c_test
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "Timer interrupt generation test"
+      dependencies: []
+    - name: cv_watchdog_reset
+      type: c_test
+      category: peripherals
+      priority: P1
+      timeout: 900
+      description: "Watchdog timer reset functionality test"
+      dependencies: []
+
+  performance_tests:
+    - name: cv_cache_coherency
+      type: c_test
+      category: performance
+      priority: P1
+      timeout: 1800
+      description: "Cache coherency protocol verification"
+      dependencies: [cv_ddr_init]
+    - name: cv_bus_arbiter
+      type: c_test
+      category: performance
+      priority: P2
+      timeout: 1200
+      description: "Bus arbitration efficiency test"
+      dependencies: [cv_ddr_init]
+    - name: cv_dma_transfer
+      type: c_test
+      category: performance
+      priority: P1
+      timeout: 1800
+      description: "DMA transfer performance test"
+      dependencies: [cv_ddr_init]
+    - name: cv_interrupt_controller
+      type: c_test
+      category: performance
+      priority: P2
+      timeout: 1200
+      description: "Interrupt latency and handling test"
+      dependencies: [cv_timer_interrupt]
+
+  advanced_tests:
+    - name: cv_ethernet_basic
+      type: c_test
+      category: peripherals
+      priority: P2
+      timeout: 1200
+      description: "Ethernet basic connectivity test"
+      dependencies: []
+    - name: cv_usb_host_test
+      type: c_test
+      category: peripherals
+      priority: P2
+      timeout: 1800
+      description: "USB host functionality test"
+      dependencies: []
+    - name: cv_can_bus_test
+      type: c_test
+      category: peripherals
+      priority: P2
+      timeout: 1200
+      description: "CAN bus communication test"
+      dependencies: []
+    - name: cv_power_management
+      type: c_test
+      category: power
+      priority: P2
+      timeout: 1800
+      description: "Power domain management test"
+      dependencies: [cv_boot_basic]
+    - name: cv_thermal_test
+      type: c_test
+      category: thermal
+      priority: P2
+      timeout: 1800
+      description: "Thermal sensor and management test"
+      dependencies: []
+
+  stress_tests:
+    - name: cv_stress_memory
+      type: c_test
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Extended memory stress test"
+      dependencies: [cv_ddr_stress]
+    - name: cv_stress_interrupt
+      type: c_test
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "High frequency interrupt stress test"
+      dependencies: [cv_interrupt_controller]
+    - name: cv_stress_dma
+      type: c_test
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Continuous DMA transfer stress test"
+      dependencies: [cv_dma_transfer]
+    - name: cv_regression_stress
+      type: c_test
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Combined regression stress test"
+      dependencies: [cv_stress_memory, cv_stress_interrupt, cv_stress_dma]
+
+###############################################################################
+# Simulation Configuration
+###############################################################################
+simulation_config:
+  tool: xsim
+  wave_format: fsdb
+  default_timeout: 3600
+  max_memory: 32GB
+
+###############################################################################
+# Parallel Execution Configuration
+###############################################################################
+parallel_config:
+  max_jobs: 32
+  job_pool_size: 8
+  resource_monitoring: true
+  fail_fast: false
+  retry_failed: true
+  retry_count: 2
+
+###############################################################################
+# Report Configuration
+###############################################################################
+report_config:
+  output_dir: ./regression_results
+  generate_html: true
+  generate_json: true
+  generate_junit: true
+  email_on_complete: false
+  retention_days: 30

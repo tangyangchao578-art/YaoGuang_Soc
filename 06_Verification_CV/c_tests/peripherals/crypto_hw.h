@@ -1,0 +1,50 @@
+#ifndef CRYPTO_HW_H
+#define CRYPTO_HW_H
+
+#include <stdint.h>
+
+#define CRYPTO_BASE_ADDR  0x400C0000
+
+#define CRYPTO_REG_AES_CR          0x0000
+#define CRYPTO_REG_AES_SR          0x0004
+#define CRYPTO_REG_AES_KEYLEN      0x0008
+#define CRYPTO_REG_AES_KEY         0x0010
+#define CRYPTO_REG_AES_DIN         0x0020
+#define CRYPTO_REG_AES_DOUT        0x0030
+#define CRYPTO_REG_SHA_CR          0x0100
+#define CRYPTO_REG_SHA_SR          0x0104
+#define CRYPTO_REG_SHA_DATAIN      0x0110
+#define CRYPTO_REG_RSA_CR          0x0200
+#define CRYPTO_REG_RSA_SR          0x0204
+#define CRYPTO_REG_RSA_N_WORDS     0x0208
+#define CRYPTO_REG_TRNG_CR         0x0300
+#define CRYPTO_REG_TRNG_SR         0x0304
+#define CRYPTO_REG_TRNG_DATA       0x0308
+#define CRYPTO_REG_KEY_VALID       0x0400
+
+#define CRYPTO_AES_CR_ECB          0x00000001
+#define CRYPTO_AES_CR_CBC          0x00000002
+#define CRYPTO_AES_CR_CTR          0x00000003
+#define CRYPTO_AES_CR_ENC          0x00000000
+#define CRYPTO_AES_CR_DEC          0x00000010
+#define CRYPTO_AES_CR_START        0x00000001
+#define CRYPTO_AES_CR_KEYLEN_128   0x00000000
+#define CRYPTO_AES_CR_KEYLEN_192   0x00000020
+#define CRYPTO_AES_CR_KEYLEN_256   0x00000040
+#define CRYPTO_AES_SR_DONE         0x00000001
+#define CRYPTO_AES_SR_ERROR        0x00000002
+#define CRYPTO_SHA_CR_SHA256       0x00000001
+#define CRYPTO_SHA_CR_START        0x00000002
+#define CRYPTO_SHA_SR_DONE         0x00000001
+#define CRYPTO_RSA_CR_MODEXP       0x00000001
+#define CRYPTO_RSA_CR_START        0x00000002
+#define CRYPTO_RSA_SR_DONE         0x00000001
+#define CRYPTO_RSA_SR_ERROR        0x00000002
+#define CRYPTO_TRNG_CR_ENABLE      0x00000001
+#define CRYPTO_TRNG_CR_START       0x00000002
+#define CRYPTO_TRNG_SR_RDY         0x00000001
+#define CRYPTO_KEY_VALID           0x00000001
+
+void test_crypto(void);
+
+#endif

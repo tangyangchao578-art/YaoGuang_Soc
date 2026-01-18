@@ -1,0 +1,493 @@
+# YaoGuang SoC CV Test List
+# Level: CV Verification Architect
+# Date: 2026-01-18
+
+###############################################################################
+# C Test Cases - Boot Category
+###############################################################################
+c_tests:
+  boot:
+    - id: BOOT_001
+      name: cv_boot_basic
+      file: c_tests/boot/cv_boot_basic.c
+      category: boot
+      priority: P0
+      timeout: 300
+      description: "Basic boot ROM and primary bootloader test"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [critical, sanity]
+      
+    - id: BOOT_002
+      name: cv_boot_multi_stage
+      file: c_tests/boot/cv_boot_multi_stage.c
+      category: boot
+      priority: P1
+      timeout: 600
+      description: "Multi-stage boot process verification"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [BOOT_001]
+      tags: [daily]
+      
+    - id: BOOT_003
+      name: cv_boot_robustness
+      file: c_tests/boot/cv_boot_robustness.c
+      category: boot
+      priority: P2
+      timeout: 900
+      description: "Boot sequence robustness under various conditions"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [BOOT_002]
+      tags: [weekly, stress]
+      
+    - id: BOOT_004
+      name: cv_boot_secure
+      file: c_tests/boot/cv_boot_secure.c
+      category: boot
+      priority: P1
+      timeout: 600
+      description: "Secure boot verification test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [BOOT_001]
+      tags: [security]
+
+  ddr:
+    - id: DDR_001
+      name: cv_ddr_init
+      file: c_tests/ddr/cv_ddr_init.c
+      category: ddr
+      priority: P0
+      timeout: 600
+      description: "DDR initialization and basic read/write verification"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [critical, sanity]
+      
+    - id: DDR_002
+      name: cv_ddr_stress
+      file: c_tests/ddr/cv_ddr_stress.c
+      category: ddr
+      priority: P1
+      timeout: 1200
+      description: "DDR stress test with pattern variations"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [DDR_001]
+      tags: [daily, stress]
+      
+    - id: DDR_003
+      name: cv_ddr_bandwidth
+      file: c_tests/ddr/cv_ddr_bandwidth.c
+      category: ddr
+      priority: P1
+      timeout: 1800
+      description: "DDR memory bandwidth measurement"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [DDR_001]
+      tags: [performance, weekly]
+      
+    - id: DDR_004
+      name: cv_ddr_latency
+      file: c_tests/ddr/cv_ddr_latency.c
+      category: ddr
+      priority: P1
+      timeout: 1800
+      description: "DDR memory latency measurement"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [DDR_001]
+      tags: [performance, weekly]
+      
+    - id: DDR_005
+      name: cv_ddr_ecc
+      file: c_tests/ddr/cv_ddr_ecc.c
+      category: ddr
+      priority: P2
+      timeout: 2400
+      description: "DDR ECC error detection and correction test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [safety, weekly]
+      
+    - id: DDR_006
+      name: cv_ddr_refresh
+      file: c_tests/ddr/cv_ddr_refresh.c
+      category: ddr
+      priority: P2
+      timeout: 1800
+      description: "DDR refresh timing and data integrity test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [stress]
+
+  peripherals:
+    - id: PERI_001
+      name: cv_uart_hello_world
+      file: c_tests/peripherals/cv_uart_hello_world.c
+      category: peripherals
+      priority: P0
+      timeout: 300
+      description: "UART basic communication test"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [critical, sanity]
+      
+    - id: PERI_002
+      name: cv_gpio_led_test
+      file: c_tests/peripherals/cv_gpio_led_test.c
+      category: peripherals
+      priority: P0
+      timeout: 300
+      description: "GPIO output control and LED blinking test"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [critical, sanity]
+      
+    - id: PERI_003
+      name: cv_spi_flash_test
+      file: c_tests/peripherals/cv_spi_flash_test.c
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "SPI flash read/write/erase operations"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [daily]
+      
+    - id: PERI_004
+      name: cv_i2c_sensor_test
+      file: c_tests/peripherals/cv_i2c_sensor_test.c
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "I2C temperature sensor communication"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [daily]
+      
+    - id: PERI_005
+      name: cv_pwm_led_control
+      file: c_tests/peripherals/cv_pwm_led_control.c
+      category: peripherals
+      priority: P2
+      timeout: 600
+      description: "PWM LED brightness and color control"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [weekly]
+      
+    - id: PERI_006
+      name: cv_timer_interrupt
+      file: c_tests/peripherals/cv_timer_interrupt.c
+      category: peripherals
+      priority: P1
+      timeout: 600
+      description: "Timer interrupt generation and handling"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: []
+      tags: [daily]
+      
+    - id: PERI_007
+      name: cv_watchdog_reset
+      file: c_tests/peripherals/cv_watchdog_reset.c
+      category: peripherals
+      priority: P1
+      timeout: 900
+      description: "Watchdog timer reset functionality"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [PERI_006]
+      tags: [safety, daily]
+      
+    - id: PERI_008
+      name: cv_ethernet_basic
+      file: c_tests/peripherals/cv_ethernet_basic.c
+      category: peripherals
+      priority: P2
+      timeout: 1200
+      description: "Ethernet MAC basic connectivity test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: []
+      tags: [weekly]
+      
+    - id: PERI_009
+      name: cv_usb_host_test
+      file: c_tests/peripherals/cv_usb_host_test.c
+      category: peripherals
+      priority: P2
+      timeout: 1800
+      description: "USB host controller enumeration test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: []
+      tags: [weekly]
+      
+    - id: PERI_010
+      name: cv_can_bus_test
+      file: c_tests/peripherals/cv_can_bus_test.c
+      category: peripherals
+      priority: P2
+      timeout: 1200
+      description: "CAN bus message transmission and reception"
+      flow: simulation
+      targets: [emulation]
+      dependencies: []
+      tags: [automotive, weekly]
+
+  performance:
+    - id: PERF_001
+      name: cv_cache_coherency
+      file: c_tests/performance/cv_cache_coherency.c
+      category: performance
+      priority: P1
+      timeout: 1800
+      description: "Cache coherency protocol verification across cores"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [performance, weekly]
+      
+    - id: PERF_002
+      name: cv_bus_arbiter
+      file: c_tests/performance/cv_bus_arbiter.c
+      category: performance
+      priority: P2
+      timeout: 1200
+      description: "Bus arbitration efficiency under load"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [performance, weekly]
+      
+    - id: PERF_003
+      name: cv_dma_transfer
+      file: c_tests/performance/cv_dma_transfer.c
+      category: performance
+      priority: P1
+      timeout: 1800
+      description: "DMA transfer performance and scatter-gather"
+      flow: simulation
+      targets: [fpga, emulation]
+      dependencies: [DDR_001]
+      tags: [performance, daily]
+      
+    - id: PERF_004
+      name: cv_interrupt_controller
+      file: c_tests/performance/cv_interrupt_controller.c
+      category: performance
+      priority: P2
+      timeout: 1200
+      description: "Interrupt latency and nested interrupt handling"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [PERI_006]
+      tags: [performance, weekly]
+      
+    - id: PERF_005
+      name: cv_noc_throughput
+      file: c_tests/performance/cv_noc_throughput.c
+      category: performance
+      priority: P2
+      timeout: 2400
+      description: "Network-on-Chip throughput measurement"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [performance, full]
+      
+    - id: PERF_006
+      name: cv_memory_controller
+      file: c_tests/performance/cv_memory_controller.c
+      category: performance
+      priority: P2
+      timeout: 1800
+      description: "Memory controller efficiency under concurrent access"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_001]
+      tags: [performance, full]
+
+  stress:
+    - id: STRESS_001
+      name: cv_stress_memory
+      file: c_tests/stress/cv_stress_memory.c
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Extended memory stress test for 24+ hours"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [DDR_002]
+      tags: [stress, full]
+      
+    - id: STRESS_002
+      name: cv_stress_interrupt
+      file: c_tests/stress/cv_stress_interrupt.c
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "High frequency interrupt stress test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [PERF_004]
+      tags: [stress, full]
+      
+    - id: STRESS_003
+      name: cv_stress_dma
+      file: c_tests/stress/cv_stress_dma.c
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Continuous DMA transfer stress test"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [PERF_003]
+      tags: [stress, full]
+      
+    - id: STRESS_004
+      name: cv_regression_stress
+      file: c_tests/stress/cv_regression_stress.c
+      category: stress
+      priority: P3
+      timeout: 3600
+      description: "Combined regression stress test suite"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [STRESS_001, STRESS_002, STRESS_003]
+      tags: [stress, full]
+
+  power_thermal:
+    - id: POWER_001
+      name: cv_power_management
+      file: c_tests/power/cv_power_management.c
+      category: power
+      priority: P2
+      timeout: 1800
+      description: "Power domain management and DVFS"
+      flow: simulation
+      targets: [emulation]
+      dependencies: [BOOT_001]
+      tags: [power, weekly]
+      
+    - id: POWER_002
+      name: cv_thermal_test
+      file: c_tests/thermal/cv_thermal_test.c
+      category: thermal
+      priority: P2
+      timeout: 1800
+      description: "Thermal sensor reading and thermal throttling"
+      flow: simulation
+      targets: [emulation]
+      dependencies: []
+      tags: [thermal, weekly]
+
+###############################################################################
+# Simulation Test Cases
+###############################################################################
+simulation_tests:
+  - id: SIM_001
+    name: cv_soc_top_rtl
+    type: rtl_simulation
+    category: integration
+    priority: P0
+    timeout: 3600
+    description: "Full SoC top-level RTL simulation"
+    targets: [xsim, vcs]
+    dependencies: []
+    tags: [critical, sanity]
+    
+  - id: SIM_002
+    name: cv_noc_integration
+    type: rtl_simulation
+    category: integration
+    priority: P1
+    timeout: 3600
+    description: "NoC integration and routing verification"
+    targets: [xsim, vcs]
+    dependencies: []
+    tags: [daily]
+    
+  - id: SIM_003
+    name: cv_clock_reset_domain
+    type: rtl_simulation
+    category: integration
+    priority: P1
+    timeout: 2400
+    description: "Clock and reset domain crossing verification"
+    targets: [xsim, vcs]
+    dependencies: []
+    tags: [safety, weekly]
+    
+  - id: SIM_004
+    name: cv_power_up_sequence
+    type: rtl_simulation
+    category: integration
+    priority: P1
+    timeout: 1800
+    description: "Power-up sequence and initialization"
+    targets: [xsim, vcs]
+    dependencies: []
+    tags: [safety, daily]
+
+###############################################################################
+# FPGA Test Cases
+###############################################################################
+fpga_tests:
+  - id: FPGA_001
+    name: cv_fpga_boot
+    type: fpga
+    category: boot
+    priority: P0
+    timeout: 600
+    description: "FPGA boot image generation and verification"
+    bitstream: fpga/boot/cv_fpga_boot.bit
+    targets: [fpga]
+    dependencies: []
+    tags: [critical, fpga]
+    
+  - id: FPGA_002
+    name: cv_fpga_ddr_test
+    type: fpga
+    category: ddr
+    priority: P0
+    timeout: 1200
+    description: "FPGA DDR memory calibration and test"
+    bitstream: fpga/ddr/cv_fpga_ddr.bit
+    targets: [fpga]
+    dependencies: [FPGA_001]
+    tags: [critical, fpga]
+
+###############################################################################
+# Test Priority Mapping
+###############################################################################
+priority_mapping:
+  P0: "critical - must pass for any release"
+  P1: "high - must pass for daily builds"
+  P2: "medium - must pass for weekly builds"
+  P3: "low - required for full regression only"
+
+###############################################################################
+# Timeout Guidelines (in seconds)
+###############################################################################
+timeout_guidelines:
+  sanity: 300
+  daily: 600
+  weekly: 1800
+  full: 3600
+  stress: 3600
+  performance: 1800
