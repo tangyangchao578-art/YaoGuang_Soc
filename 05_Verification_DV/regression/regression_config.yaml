@@ -1,0 +1,132 @@
+# Regression Configuration
+# YaoGuang SoC DV Verification
+
+# Sanity Regression - 每次提交运行
+sanity:
+  description: "Sanity test suite - run on every commit"
+  test_list:
+    - test_sanity
+    - test_pmu_power_on
+    - test_pmu_reset_sequence
+    - test_noc_basic_routing
+  timeout: 300  # 5 minutes
+  pass_threshold: 100%
+
+# Nightly Regression - 每日运行
+nightly:
+  description: "Nightly regression suite"
+  test_list:
+    # Safety Island Tests
+    - test_safety_lockstep_basic
+    - test_safety_lockstep_error
+    - test_safety_ecc_correct
+    - test_safety_ecc_error
+    - test_safety_watchdog
+    - test_safety_fault_injection
+
+    # PMU Tests
+    - test_pmu_power_on
+    - test_pmu_power_off
+    - test_pmu_sequence
+    - test_pmu_dvfs
+    - test_pmu_low_power
+    - test_pmu_protection
+
+    # NPU Tests
+    - test_npu_int8_matmul
+    - test_npu_int16_matmul
+    - test_npu_fp16_matmul
+    - test_npu_activation
+    - test_npu_pooling
+    - test_npu_performance
+
+    # NoC Tests
+    - test_noc_routing
+    - test_noc_qos
+    - test_noc_performance
+    - test_noc_congestion
+
+    # CPU Tests
+    - test_cpu_instruction
+    - test_cpu_cache
+    - test_cpu_interrupt
+
+    # Memory Tests
+    - test_mem_ctrl_read
+    - test_mem_ctrl_write
+    - test_mem_ctrl_refresh
+
+    # Peripheral Tests
+    - test_pcie_link
+    - test_ethernet_mac
+    - test_usb_enum
+  timeout: 7200  # 2 hours
+  pass_threshold: 95%
+
+# Weekly Regression - 每周运行
+weekly:
+  description: "Weekly comprehensive regression"
+  test_list:
+    # All nightly tests
+    - test_safety_*
+    - test_pmu_*
+    - test_npu_*
+    - test_noc_*
+    - test_cpu_*
+    - test_mem_*
+    - test_pcie_*
+    - test_ethernet_*
+    - test_usb_*
+
+    # Additional stress tests
+    - test_safety_stress
+    - test_pmu_stress
+    - test_noc_stress
+    - test_memory_stress
+
+    # Random tests
+    - test_random_basic
+    - test_random_legal
+    - test_random_illegal
+  timeout: 28800  # 8 hours
+  pass_threshold: 90%
+
+# Full Regression - 发布前运行
+full:
+  description: "Full regression suite before signoff"
+  test_list:
+    # All weekly tests
+    - "*"
+
+    # Constrained random tests
+    - test_csr_random
+    - test_sequence_random
+    - test_stress_random
+
+    # Error injection tests
+    - test_error_injection_all
+    - test_recovery_all
+
+    # Performance tests
+    - test_performance_all
+    - test_throughput_all
+    - test_latency_all
+  timeout: 86400  # 24 hours
+  pass_threshold: 85%
+
+# Test Configuration Template
+test_defaults:
+  seed: random
+  wave: 0
+  coverage: 1
+  timeout: 600  # 10 minutes per test
+
+# Coverage Targets
+coverage_targets:
+  line: 95
+  branch: 95
+  condition: 90
+  toggle: 90
+  fsm: 100
+  assertion: 90
+  functional: 100
