@@ -1,0 +1,211 @@
+{
+  "project": {
+    "name": "AI_Accelerator_Chip",
+    "version": "1.0",
+    "target_market": "边缘AI推理",
+    "target_customers": 1000,
+    "unit_demand": 100,
+    "avg_price": 500,
+    "geo_coverage": 0.5,
+    "product_coverage": 0.8,
+    "market_share_target": 0.1,
+    "market_growth_rate": 0.2
+  },
+  "competitors": [
+    {
+      "name": "NVIDIA",
+      "product_name": "Jetson Nano",
+      "performance": 80,
+      "power": 10,
+      "cost": 100,
+      "functionality": 85,
+      "reliability": 90,
+      "ecosystem": 95
+    },
+    {
+      "name": "Google",
+      "product_name": "Coral Edge TPU",
+      "performance": 70,
+      "power": 5,
+      "cost": 75,
+      "functionality": 75,
+      "reliability": 85,
+      "ecosystem": 80
+    },
+    {
+      "name": "Intel",
+      "product_name": "Movidius VPU",
+      "performance": 75,
+      "power": 8,
+      "cost": 90,
+      "functionality": 80,
+      "reliability": 85,
+      "ecosystem": 75
+    },
+    {
+      "name": "My Product",
+      "product_name": "AI Accelerator V1",
+      "performance": 90,
+      "power": 7,
+      "cost": 85,
+      "functionality": 90,
+      "reliability": 90,
+      "ecosystem": 70
+    }
+  ],
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "title": "AI推理加速",
+      "description": "支持深度学习推理加速，包括CNN、RNN等网络",
+      "priority": "CRITICAL",
+      "category": "MUST_HAVE",
+      "status": "IN_PROGRESS",
+      "estimated_effort": 40,
+      "assignee": "Architect Team"
+    },
+    {
+      "id": "REQ-002",
+      "title": "低功耗设计",
+      "description": "功耗小于10W，支持边缘设备部署",
+      "priority": "CRITICAL",
+      "category": "MUST_HAVE",
+      "status": "IN_PROGRESS",
+      "estimated_effort": 30,
+      "assignee": "Power Team"
+    },
+    {
+      "id": "REQ-003",
+      "title": "多接口支持",
+      "description": "支持PCIe、USB、Ethernet等接口",
+      "priority": "HIGH",
+      "category": "SHOULD_HAVE",
+      "status": "PLANNED",
+      "estimated_effort": 25,
+      "assignee": "Interface Team"
+    },
+    {
+      "id": "REQ-004",
+      "title": "软件生态",
+      "description": "提供完整的软件栈和开发工具",
+      "priority": "HIGH",
+      "category": "SHOULD_HAVE",
+      "status": "PLANNED",
+      "estimated_effort": 50,
+      "assignee": "Software Team"
+    },
+    {
+      "id": "REQ-005",
+      "title": "安全认证",
+      "description": "通过ISO 26262 ASIL-B认证",
+      "priority": "MEDIUM",
+      "category": "COULD_HAVE",
+      "status": "PLANNED",
+      "estimated_effort": 35,
+      "assignee": "Safety Team"
+    },
+    {
+      "id": "REQ-006",
+      "title": "成本优化",
+      "description": "芯片成本小于$50",
+      "priority": "MEDIUM",
+      "category": "COULD_HAVE",
+      "status": "PLANNED",
+      "estimated_effort": 20,
+      "assignee": "Cost Team"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "MS-001",
+      "name": "需求冻结",
+      "description": "完成产品需求定义和评审",
+      "target_date": "2026-02-28",
+      "status": "PLANNED",
+      "deliverables": ["PRD文档", "需求评审报告"],
+      "owner": "Product Manager"
+    },
+    {
+      "id": "MS-002",
+      "name": "架构冻结",
+      "description": "完成系统架构设计和评审",
+      "target_date": "2026-04-30",
+      "status": "PLANNED",
+      "deliverables": ["架构文档", "技术方案"],
+      "owner": "System Architect"
+    },
+    {
+      "id": "MS-003",
+      "name": "RTL冻结",
+      "description": "完成RTL设计和评审",
+      "target_date": "2026-08-31",
+      "status": "PLANNED",
+      "deliverables": ["RTL代码", "设计文档"],
+      "owner": "Design Team"
+    },
+    {
+      "id": "MS-004",
+      "name": "验证完成",
+      "description": "完成功能验证和性能验证",
+      "target_date": "2026-12-31",
+      "status": "PLANNED",
+      "deliverables": ["验证报告", "覆盖率报告"],
+      "owner": "Verification Team"
+    },
+    {
+      "id": "MS-005",
+      "name": "流片",
+      "description": "完成流片准备和提交",
+      "target_date": "2027-02-28",
+      "status": "PLANNED",
+      "deliverables": ["GDSII文件", "流片文档"],
+      "owner": "Backend Team"
+    },
+    {
+      "id": "MS-006",
+      "name": "样片回片",
+      "description": "样片回片和初步测试",
+      "target_date": "2027-06-30",
+      "status": "PLANNED",
+      "deliverables": ["样片", "测试报告"],
+      "owner": "Test Team"
+    },
+    {
+      "id": "MS-007",
+      "name": "客户样品",
+      "description": "向客户发送样品",
+      "target_date": "2027-08-31",
+      "status": "PLANNED",
+      "deliverables": ["客户样品", "应用笔记"],
+      "owner": "Product Manager"
+    },
+    {
+      "id": "MS-008",
+      "name": "产品发布",
+      "description": "产品正式发布",
+      "target_date": "2027-10-31",
+      "status": "PLANNED",
+      "deliverables": ["发布文档", "市场材料"],
+      "owner": "Product Manager"
+    }
+  ],
+  "cost_analysis": {
+    "die_size_mm2": 25,
+    "wafer_cost": 3000,
+    "yield_rate": 0.75,
+    "utilization_rate": 0.85,
+    "packaging_cost": 5,
+    "test_cost": 3,
+    "design_cost": 500000,
+    "verification_cost": 300000,
+    "software_cost": 200000,
+    "marketing_cost": 150000,
+    "support_cost": 100000
+  },
+  "pricing_strategy": {
+    "method": "value_based",
+    "target_margin": 0.6,
+    "positioning": "premium",
+    "discount_policy": "volume_discount"
+  }
+}

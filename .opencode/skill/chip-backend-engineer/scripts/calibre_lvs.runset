@@ -1,0 +1,479 @@
+#
+# Calibre LVS Runset文件
+# 用于Layout vs Schematic验证
+#
+# 使用方法:
+# calibre -lvs design.lvs
+#
+
+# ============================================================================
+# 1. 版图信息
+# ============================================================================
+
+# 输入版图文件
+# TODO: 替换为实际的GDS文件路径
+LAYOUT PATH "path/to/your_design.gds"
+# LAYOUT PRIMARY "your_design"
+# LAYOUT SYSTEM GDSII
+
+# 或使用DEF格式（如果适用）
+# LAYOUT PATH "path/to/your_design.def"
+# LAYOUT PRIMARY "your_design"
+# LAYOUT SYSTEM DEF
+
+# 版图过滤器（可选）
+# LAYOUT FILTER "layout_filter.txt"
+
+# ============================================================================
+# 2. 电路图信息
+# ============================================================================
+
+# 输入电路图文件
+# TODO: 替换为实际的电路图文件路径
+# SPICE PATH "path/to/your_design.spice"
+# SOURCE PRIMARY "your_design"
+# SOURCE SYSTEM SPICE
+
+# 或使用CDL格式
+# SOURCE PATH "path/to/your_design.cdl"
+# SOURCE PRIMARY "your_design"
+# SOURCE SYSTEM CDL
+
+# 或使用Verilog网表（如果使用Verilog）
+# SOURCE PATH "path/to/your_design.v"
+# SOURCE PRIMARY "your_design"
+# SOURCE SYSTEM VERILOG
+
+# 电路图过滤器（可选）
+# SOURCE FILTER "source_filter.txt"
+
+# ============================================================================
+# 3. 数据库信息
+# ============================================================================
+
+DATABASE PRIMARY "your_design"
+DATABASE SYSTEM GDSII
+
+# ============================================================================
+# 4. 工艺文件
+# ============================================================================
+
+# 工艺规则文件
+# TODO: 替换为实际的工艺文件路径
+# LAYER MAP "tech_layer.map"
+
+# GDS映射文件
+# GDS MAP FILE "gds_map.txt"
+
+# SPICE映射文件
+# SPICE MAP FILE "spice_map.txt"
+
+# 设备规则文件
+# DEVICE RULE FILE "device_rules.txt"
+
+# ============================================================================
+# 5. 设备识别规则
+# ============================================================================
+
+# NMOS识别
+# TODO: 根据实际工艺调整
+# DEVICE NMOS
+#   LAYER GATE M1
+#   LAYER SOURCE M1
+#   LAYER DRAIN M1
+#   LAYER BULK N_WELL
+#   MODEL NMOS_MODEL
+
+# PMOS识别
+# DEVICE PMOS
+#   LAYER GATE M1
+#   LAYER SOURCE M1
+#   LAYER DRAIN M1
+#   LAYER BULK P_WELL
+#   MODEL PMOS_MODEL
+
+# 电阻识别
+# DEVICE RESISTOR
+#   LAYER TERMINAL1 M1
+#   LAYER TERMINAL2 M2
+#   LAYER BODY M3
+#   MODEL RESISTOR_MODEL
+
+# 电容识别
+# DEVICE CAPACITOR
+#   LAYER TERMINAL1 M1
+#   LAYER TERMINAL2 M2
+#   LAYER BODY M3
+#   MODEL CAPACITOR_MODEL
+
+# 二极管识别
+# DEVICE DIODE
+#   LAYER ANODE M1
+#   LAYER CATHODE M2
+#   LAYER BODY M3
+#   MODEL DIODE_MODEL
+
+# 双极晶体管识别
+# DEVICE BJT
+#   LAYER COLLECTOR M1
+#   LAYER BASE M2
+#   LAYER EMITTER M3
+#   MODEL BJT_MODEL
+
+# MIM电容识别
+# DEVICE MIMCAP
+#   LAYER PLATE1 M1
+#   LAYER PLATE2 M2
+#   MODEL MIMCAP_MODEL
+
+# ============================================================================
+# 6. 互连规则
+# ============================================================================
+
+# 连接层定义
+# TODO: 根据实际工艺调整
+# CONNECT M1 M1 M2
+# CONNECT M2 M1 M2
+# CONNECT M3 M2 M3
+# CONNECT M4 M3 M4
+# CONNECT M5 M4 M5
+
+# 通孔连接
+# CONNECT M1 M2 VIA1
+# CONNECT M2 M3 VIA2
+# CONNECT M3 M4 VIA3
+# CONNECT M4 M5 VIA4
+
+# 接触连接
+# CONTACT M1 VIA1 CONTACT
+# CONTACT M2 VIA2 CONTACT
+# CONTACT M3 VIA3 CONTACT
+# CONTACT M4 VIA4 CONTACT
+
+# ============================================================================
+# 7. 端口定义
+# ============================================================================
+
+# 版图端口
+# TODO: 根据实际设计定义端口
+# LAYOUT PORTS
+#   VDD M1
+#   VSS M1
+#   clk M1
+#   reset_n M1
+#   data_in M1
+#   data_out M1
+
+# 电路图端口
+# SOURCE PORTS
+#   VDD VDD
+#   VSS VSS
+#   clk clk
+#   reset_n reset_n
+#   data_in data_in
+#   data_out data_out
+
+# ============================================================================
+# 8. 电源网络定义
+# ============================================================================
+
+# 电源网络
+# TODO: 根据实际设计定义电源网络
+# POWER NETS VDD
+# GROUND NETS VSS
+
+# 电源层
+# POWER LAYER M1
+# GROUND LAYER M1
+
+# ============================================================================
+# 9. 设备映射规则
+# ============================================================================
+
+# 版图到电路图映射
+# TODO: 根据实际设计调整
+# DEVICE MAP
+#   LAYOUT NMOS_MODEL SOURCE NMOS_MODEL
+#   LAYOUT PMOS_MODEL SOURCE PMOS_MODEL
+#   LAYOUT RESISTOR_MODEL SOURCE RESISTOR_MODEL
+#   LAYOUT CAPACITOR_MODEL SOURCE CAPACITOR_MODEL
+
+# 参数映射
+# PARAMETER MAP
+#   LAYOUT L SOURCE L
+#   LAYOUT W SOURCE W
+#   LAYOUT AS SOURCE AS
+#   LAYOUT AD SOURCE AD
+#   LAYOUT PS SOURCE PS
+#   LAYOUT PD SOURCE PD
+
+# ============================================================================
+# 10. 子电路定义
+# ============================================================================
+
+# 子电路识别
+# TODO: 根据实际设计定义子电路
+# SUBCIRCUIT
+#   NAME "memory_cell"
+#   PORTS "bit bit_bar word word_bar"
+#   DEVICES "NMOS1 NMOS2 PMOS1 PMOS2"
+
+# 子电路端口映射
+# PORT MAP
+#   SUBCIRCUIT "memory_cell"
+#   LAYOUT bit bit
+#   LAYOUT bit_bar bit_bar
+#   LAYOUT word word
+#   LAYOUT word_bar word_bar
+#   SOURCE bit bit
+#   SOURCE bit_bar bit_bar
+#   SOURCE word word
+#   SOURCE word_bar word_bar
+
+# ============================================================================
+# 11. 层次规则
+# ============================================================================
+
+# 层次模式
+HIERARCHICAL
+
+# 或平面模式
+# FLAT
+
+# 层次深度限制
+HIERARCHY DEPTH LIMIT 10
+
+# 单元识别
+# IDENTIFY CELLS
+
+# 子电路匹配
+# MATCH SUBCIRCUITS
+
+# 层次简化
+# SIMPLIFY HIERARCHY
+
+# ============================================================================
+# 12. 网络比较规则
+# ============================================================================
+
+# 网络匹配容差
+# NET MATCHING EXACT
+
+# 或宽松匹配
+# NET MATCHING RELAXED
+
+# 端点匹配
+# TERMINAL MATCHING ORDER_INDEPENDENT
+
+# 短路检查
+# CHECK SHORTS
+
+# 开路检查
+# CHECK OPENS
+
+# 布尔变量检查
+# CHECK BOOLEAN VARIABLES
+
+# ============================================================================
+# 13. 参数比较规则
+# ============================================================================
+
+# 参数容差
+# TODO: 根据实际设计调整
+# PARAMETER TOLERANCE
+#   L 5%
+#   W 5%
+#   AS 10%
+#   AD 10%
+#   PS 10%
+#   PD 10%
+
+# 电阻容差
+# RESISTANCE TOLERANCE 10%
+
+# 电容容差
+# CAPACITANCE TOLERANCE 10%
+
+# 宽长比容差
+# ASPECT RATIO TOLERANCE 5%
+
+# ============================================================================
+# 14. LVS结果输出
+# ============================================================================
+
+# 结果数据库
+LVS RESULTS DATABASE "your_design.lvs.results"
+
+# 结果摘要
+LVS SUMMARY DATABASE "your_design.lvs.summary"
+
+# 结果报告
+LVS REPORT "your_design.lvs.report"
+
+# 报告格式
+LVS REPORT OPTION SVRF
+
+# 详细报告
+# LVS REPORT OPTION VERBOSE
+
+# 错误报告
+# LVS REPORT OPTION ERRORS
+
+# 警告报告
+# LVS REPORT OPTION WARNINGS
+
+# ============================================================================
+# 15. 层次报告
+# ============================================================================
+
+# 按层次报告
+# LVS REPORT OPTION HIERARCHY
+
+# 按子电路报告
+# LVS REPORT OPTION SUBCIRCUIT
+
+# 按设备报告
+# LVS REPORT OPTION DEVICES
+
+# 按网络报告
+# LVS REPORT OPTION NETS
+
+# ============================================================================
+# 16. 性能选项
+# ============================================================================
+
+# 并行处理
+# CORES 8
+
+# 内存限制
+# MEMORY LIMIT 16
+
+# 优化级别
+# OPTIMIZE LEVEL HIGH
+
+# 64位模式
+64BIT
+
+# ============================================================================
+# 17. 过滤和排除规则
+# ============================================================================
+
+# 排除规则文件
+# EXCLUDE RULE FILE "exclude_rules.txt"
+
+# 忽略单元
+# IGNORE CELLS "fill_cell* decap_cell*"
+
+# 忽略网络
+# IGNORE NETS "VDD* VSS*"
+
+# 忽略设备
+# IGNORE DEVICES "fill_resistor* fill_capacitor*"
+
+# ============================================================================
+# 18. 调试选项
+# ============================================================================
+
+# 生成调试信息
+# GENERATE DEBUG INFO
+
+# 调试文件名
+# DEBUG FILE "debug.lvs"
+
+# 布局调试文件
+# LAYOUT DEBUG FILE "layout_debug.txt"
+
+# 电路图调试文件
+# SOURCE DEBUG FILE "source_debug.txt"
+
+# 网络调试文件
+# NET DEBUG FILE "net_debug.txt"
+
+# ============================================================================
+# 19. 比较选项
+# ============================================================================
+
+# 比较所有设备
+# COMPARE ALL DEVICES
+
+# 比较所有网络
+# COMPARE ALL NETS
+
+# 比较参数
+# COMPARE PARAMETERS
+
+# 比较子电路
+# COMPARE SUBCIRCUITS
+
+# ============================================================================
+# 20. 验证选项
+# ============================================================================
+
+# 严格模式
+# STRICT MODE
+
+# 或宽松模式
+# RELAXED MODE
+
+# 自动修正
+# AUTO CORRECT OFF
+
+# 交互模式
+# INTERACTIVE OFF
+
+# ============================================================================
+# 21. 特殊规则
+# ============================================================================
+
+# 软连接规则
+# SOFT CONNECTION "VDD"
+# SOFT CONNECTION "VSS"
+
+# 电源网络规则
+# POWER NET "VDD"
+# GROUND NET "VSS"
+
+# 浮空网络检查
+# CHECK FLOATING NETS
+
+# 未连接网络检查
+# CHECK UNCONNECTED NETS
+
+# ============================================================================
+# 22. 报告统计信息
+# ============================================================================
+
+# 设备统计
+# REPORT DEVICE STATISTICS
+
+# 网络统计
+# REPORT NET STATISTICS
+
+# 子电路统计
+# REPORT SUBCIRCUIT STATISTICS
+
+# 端口统计
+# REPORT PORT STATISTICS
+
+# ============================================================================
+# 23. 输出格式
+# ============================================================================
+
+# ASCII格式
+# OUTPUT FORMAT ASCII
+
+# 或二进制格式
+# OUTPUT FORMAT BINARY
+
+# 压缩输出
+# COMPRESS OUTPUT
+
+# ============================================================================
+# 24. 附加规则文件
+# ============================================================================
+
+# 包含外部规则文件
+# INCLUDE "additional_rules.txt"
+
+# 或使用规则库
+# RULE LIBRARY "tech_rules.lib"

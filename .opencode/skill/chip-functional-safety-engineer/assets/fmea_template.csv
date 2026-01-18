@@ -1,0 +1,16 @@
+ID,Component,Function,Failure Mode,Local Effect,System Effect,Severity,Cause,Occurrence,Controls,Detection,RPN,Recommended Actions
+FM-001,CPU,Core Processing,Lockstep Mismatch,Calculation Error,Vehicle Control Failure,9,Hardware Fault,3,Lockstep Comparator,2,54,Increase redundancy and diagnostics
+FM-002,CPU,Instruction Execution,Stuck-at-0 Fault,Wrong Instruction,Control Logic Error,9,Manufacturing Defect,2,Instruction BIST,3,54,Add instruction BIST and periodic testing
+FM-003,SRAM,Data Storage,Single Bit Flip,Data Corruption,Incorrect Sensor Reading,8,Cosmic Ray,4,ECC (SECDED),2,64,Optimize ECC coverage and add periodic scrubbing
+FM-004,SRAM,Data Storage,Multi-bit Error,Data Loss,System Crash,9,Aging Defect,3,ECC,4,108,Increase ECC capability to detect multi-bit errors
+FM-005,Flash,Program Storage,Bit Error,Code Corruption,Execution Error,9,Aging Defect,3,ECC,3,81,Implement stronger ECC and periodic CRC checks
+FM-006,Flash,Program Storage,Block Error,Program Loss,System Failure,9,Wear-out,2,ECC and CRC,2,36,Implement wear leveling and block replacement
+FM-007,Watchdog,System Monitoring,Watchdog Timeout,Watchdog Reset,False Reset,5,Software Bug,5,Window Watchdog,2,50,Improve software timing and add external watchdog
+FM-008,Power Monitor,Power Monitoring,Undervoltage,Brownout Detection,System Reset,6,Voltage Drop,4,Power Monitor,2,48,Add capacitor filtering and faster detection
+FM-009,Power Monitor,Power Monitoring,Overvoltage,Overvoltage Detection,Hardware Damage,9,Voltage Surge,3,Power Monitor,2,54,Add overvoltage protection and faster response
+FM-010,Clock Monitor,Clock Monitoring,Clock Loss,No Clock,System Hang,8,Crystal Failure,3,Clock Loss Detection,2,48,Add backup oscillator and faster detection
+FM-011,Clock Monitor,Clock Monitoring,Clock Drift,Wrong Frequency,Timing Errors,7,Crystal Aging,4,Clock Monitoring,3,112,Add frequency monitoring and periodic calibration
+FM-012,CPU,Cache Processing,Cache ECC Error,Cache Data Error,Calculation Error,8,Cosmic Ray,4,ECC,2,64,Add cache scrubbing and error logging
+FM-013,DMA Controller,Data Transfer,DMA Timeout,Transfer Failure,Data Loss,7,Bus Contention,3,Timeout Detection,3,63,Improve arbitration and add watchdog
+FM-014,Interrupt Controller,Interrupt Handling,Missed Interrupt,No Response,Control Failure,8,Priority Error,3,Interrupt Watchdog,3,72,Add interrupt monitoring and priority verification
+FM-015,Timer,Timing,Timer Drift,Wrong Timing,System Desync,7,Crystal Aging,4,Timer Calibration,3,84,Add periodic calibration and external time sync

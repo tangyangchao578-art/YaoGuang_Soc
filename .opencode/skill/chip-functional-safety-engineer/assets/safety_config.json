@@ -1,0 +1,157 @@
+{
+  "project": {
+    "name": "safety_critical_ecu",
+    "asil_level": "D",
+    "standard": "ISO 26262",
+    "version": "2018"
+  },
+  "components": [
+    {
+      "name": "ARM Cortex-R52",
+      "type": "CPU",
+      "fit_rate": 10.0,
+      "diagnostic_coverage": 95.0,
+      "failure_influence": "unsafe",
+      "safety_mechanisms": [
+        "Lockstep dual-core",
+        "ECC on caches",
+        "BIST",
+        "Watchdog"
+      ]
+    },
+    {
+      "name": "SRAM_1MB",
+      "type": "Memory",
+      "fit_rate": 100.0,
+      "diagnostic_coverage": 99.0,
+      "failure_influence": "safe",
+      "safety_mechanisms": [
+        "ECC (SECDED)",
+        "MBIST",
+        "Periodic scrubbing"
+      ]
+    },
+    {
+      "name": "Flash_4MB",
+      "type": "Memory",
+      "fit_rate": 50.0,
+      "diagnostic_coverage": 98.0,
+      "failure_influence": "safe",
+      "safety_mechanisms": [
+        "ECC",
+        "Flash BIST",
+        "CRC check"
+      ]
+    },
+    {
+      "name": "Safety_Watchdog",
+      "type": "Monitor",
+      "fit_rate": 1.0,
+      "diagnostic_coverage": 99.0,
+      "failure_influence": "safe",
+      "safety_mechanisms": [
+        "Window watchdog",
+        "External watchdog",
+        "Redundant timer"
+      ]
+    },
+    {
+      "name": "Power_Monitor",
+      "type": "Monitor",
+      "fit_rate": 5.0,
+      "diagnostic_coverage": 95.0,
+      "failure_influence": "safe",
+      "safety_mechanisms": [
+        "Voltage monitoring",
+        "Current monitoring",
+        "Power sequencing"
+      ]
+    },
+    {
+      "name": "Clock_Monitor",
+      "type": "Monitor",
+      "fit_rate": 5.0,
+      "diagnostic_coverage": 95.0,
+      "failure_influence": "safe",
+      "safety_mechanisms": [
+        "Clock loss detection",
+        "Clock frequency monitoring",
+        "Crystal health monitoring"
+      ]
+    }
+  ],
+  "safety_requirements": [
+    {
+      "id": "FSR-001",
+      "description": "ECU must detect and report any single hardware fault within 10ms",
+      "asil_level": "D",
+      "ftti": 10.0,
+      "safe_state": "Reset ECU",
+      "safety_mechanisms": [
+        "Lockstep comparison",
+        "ECC checks",
+        "Watchdog timeout"
+      ],
+      "verification_methods": [
+        "Fault injection",
+        "FMEA",
+        "FTA"
+      ]
+    },
+    {
+      "id": "FSR-002",
+      "description": "Memory errors must be detected and corrected within 1ms",
+      "asil_level": "D",
+      "ftti": 1.0,
+      "safe_state": "Correct and continue",
+      "safety_mechanisms": [
+        "ECC (SECDED)",
+        "Periodic memory check",
+        "Error logging"
+      ],
+      "verification_methods": [
+        "Fault injection",
+        "Memory testing"
+      ]
+    },
+    {
+      "id": "FSR-003",
+      "description": "Power supply faults must be detected within 5ms",
+      "asil_level": "D",
+      "ftti": 5.0,
+      "safe_state": "Power down gracefully",
+      "safety_mechanisms": [
+        "Brown-out detection",
+        "Over-voltage protection",
+        "Power sequencing"
+      ],
+      "verification_methods": [
+        "Fault injection",
+        "Power testing"
+      ]
+    },
+    {
+      "id": "FSR-004",
+      "description": "Clock faults must be detected within 2ms",
+      "asil_level": "D",
+      "ftti": 2.0,
+      "safe_state": "Switch to backup clock",
+      "safety_mechanisms": [
+        "Clock loss detection",
+        "Clock monitoring",
+        "Backup oscillator"
+      ],
+      "verification_methods": [
+        "Fault injection",
+        "Clock testing"
+      ]
+    }
+  ],
+  "targets": {
+    "spfm": 99.0,
+    "lfm": 90.0,
+    "pmhf": 0.1,
+    "diagnostic_coverage": 99.0,
+    "fault_coverage": 95.0
+  }
+}

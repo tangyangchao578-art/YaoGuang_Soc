@@ -1,0 +1,373 @@
+# ============================================================================
+# UPF (Unified Power Format) 功耗意图文件模板
+# IEEE 1801 标准
+# ============================================================================
+
+# ============================================================================
+# 1. 电源网络定义
+# ============================================================================
+
+# 创建电源网络
+create_power_net VDD
+create_power_net VSS
+
+# 创建额外的电源网络（如果有多电源域）
+create_power_net VDD_1P2
+create_power_net VDD_0P9
+create_power_net VDD_RETENTION
+
+# ============================================================================
+# 2. 接地网络定义
+# ============================================================================
+
+# 接地网络通常只有一个
+# create_power_net VSS 已经在上面定义
+
+# ============================================================================
+# 3. 电源域定义
+# ============================================================================
+
+# 顶层电源域（包含整个设计）
+create_power_domain TOP \
+  -include_scope
+
+# 核心逻辑电源域
+create_power_domain PD_CORE \
+  -elements {core* core_inst*} \
+  -default
+
+# 外设电源域
+create_power_domain PD_PERIPHERAL \
+  -elements {periph* peripheral_inst*}
+
+# 存储器电源域
+create_power_domain PD_MEMORY \
+  -elements {memory* mem_inst*}
+
+# 模拟电源域（通常常开）
+create_power_domain PD_ANALOG \
+  -elements {analog* analog_block*}
+
+# 高速电源域
+create_power_domain PD_HIGH_SPEED \
+  -elements {high_speed_logic*}
+
+# 低速电源域
+create_power_domain PD_LOW_SPEED \
+  -elements {low_speed_logic*}
+
+# ============================================================================
+# 4. 电源开关定义
+# ============================================================================
+
+# 创建核心电源开关（头开关）
+create_power_switch PS_CORE_HEADER \
+  -domain PD_CORE \
+  -input_supply_port VDD \
+  -output_supply_port VDD_CORE \
+  -control_port core_pwr_enable \
+  -ack_port core_pwr_ack \
+  -on_state ON_CORE
+
+# 创建外设电源开关（尾开关）
+create_power_switch PS_PERIPHERAL_FOOTER \
+  -domain PD_PERIPHERAL \
+  -input_supply_port VSS \
+  -output_supply_port VSS_PERIPH \
+  -control_port periph_pwr_enable \
+  -ack_port periph_pwr_ack \
+  -on_state ON_PERIPH
+
+# 创建存储器电源开关
+create_power_switch PS_MEMORY \
+  -domain PD_MEMORY \
+  -input_supply_port VDD_0P9 \
+  -output_supply_port VDD_MEM \
+  -control_port mem_pwr_enable \
+  -ack_port mem_pwr_ack \
+  -on_state ON_MEMORY
+
+# ============================================================================
+# 5. 保持寄存器定义
+# ============================================================================
+
+# 创建保持电源网络
+create_power_net VDD_RETENTION
+
+# 为核心域添加保持寄存器
+# 当电源关闭时，保持寄存器仍然由VDD_RETENTION供电
+create_retention_control RC_CORE \
+  -domain PD_CORE \
+  -retention_power_net VDD_RETENTION \
+  -retention_ground_net VSS \
+  -save_signal core_save \
+  -restore_signal core_restore \
+  -always_on_supply_port VDD_RETENTION \
+  -always_on_ground_port VSS
+
+# 指定哪些寄存器需要保持
+# set_retention_elements -elements [get_cells core_key_reg*] RC_CORE
+
+# ============================================================================
+# 6. 隔离单元定义
+# ============================================================================
+
+# 创建核心域隔离策略
+create_isolation_strategy ISO_CORE_INPUT \
+  -domain PD_CORE \
+  -isolation_power_net VDD \
+  -isolation_ground_net VSS \
+  -clamp_value 0 \
+  -location self \
+  -applies_to inputs
+
+create_isolation_strategy ISO_CORE_OUTPUT \
+  -domain PD_CORE \
+  -isolation_power_net VDD \
+  -isolation_ground_net VSS \
+  -clamp_value 0 \
+  -location self \
+  -applies_to outputs
+
+# 指定隔离单元
+# set_isolation_control -elements [get_cells iso_cell*] ISO_CORE_INPUT
+
+# ============================================================================
+# 7. 状态保存和恢复定义
+# ============================================================================
+
+# 创建状态保存控制
+create_state_table ST_CORE \
+  -domain PD_CORE
+
+# 添加状态保存信号
+# add_state_signal -save_signal core_save \
+#   -restore_signal core_restore \
+#   -elements [get_cells core_reg*] ST_CORE
+
+# ============================================================================
+# 8. 电源状态定义
+# ============================================================================
+
+# 定义系统级电源状态
+create_power_state PSS_FULL_POWER \
+  -domain TOP \
+  -state {PD_CORE ON_CORE VDD VSS} \
+  -state {PD_PERIPHERAL ON_PERIPH VDD VSS} \
+  -state {PD_MEMORY ON_MEMORY VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# 定义部分电源状态（外设关闭）
+create_power_state PSS_PERIPH_OFF \
+  -domain TOP \
+  -state {PD_CORE ON_CORE VDD VSS} \
+  -state {PD_PERIPHERAL OFF VDD VSS} \
+  -state {PD_MEMORY ON_MEMORY VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# 定义部分电源状态（存储器关闭）
+create_power_state PSS_MEMORY_OFF \
+  -domain TOP \
+  -state {PD_CORE ON_CORE VDD VSS} \
+  -state {PD_PERIPHERAL ON_PERIPH VDD VSS} \
+  -state {PD_MEMORY OFF VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# 定义深度睡眠状态（大部分域关闭）
+create_power_state PSS_DEEP_SLEEP \
+  -domain TOP \
+  -state {PD_CORE OFF VDD VSS} \
+  -state {PD_PERIPHERAL OFF VDD VSS} \
+  -state {PD_MEMORY OFF VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# 定义保持状态（核心保持）
+create_power_state PSS_RETENTION \
+  -domain TOP \
+  -state {PD_CORE CORE_RETENTION VDD VSS} \
+  -state {PD_PERIPHERAL OFF VDD VSS} \
+  -state {PD_MEMORY OFF VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# ============================================================================
+# 9. 端口连接
+# ============================================================================
+
+# 连接顶层端口到电源网络
+connect_supply_net VDD -ports [get_ports -filter "name =~ VDD*"]
+connect_supply_net VSS -ports [get_ports -filter "name =~ VSS*"]
+
+# 或指定具体端口
+# connect_supply_net VDD -ports [get_ports {vdd_core vdd_periph}]
+# connect_supply_net VSS -ports [get_ports {vss_core vss_periph}]
+
+# ============================================================================
+# 10. 电源策略定义
+# ============================================================================
+
+# 创建电源策略（可选）
+create_power_strategy STRATEGY_LOW_POWER \
+  -default
+
+# 创建电源策略（高性能）
+create_power_strategy STRATEGY_HIGH_PERFORMANCE \
+  -default
+
+# ============================================================================
+# 11. 多电压域定义
+# ============================================================================
+
+# 高速域使用1.2V
+set_supply_voltage VDD_1P2 -domain PD_HIGH_SPEED -value 1.2
+
+# 低速域使用0.9V
+set_supply_voltage VDD_0P9 -domain PD_LOW_SPEED -value 0.9
+
+# 核心域使用0.9V
+set_supply_voltage VDD -domain PD_CORE -value 0.9
+
+# 保持域使用0.9V
+set_supply_voltage VDD_RETENTION -domain PD_CORE -value 0.9
+
+# ============================================================================
+# 12. 电平转换单元定义
+# ============================================================================
+
+# 定义电平转换器（如果需要）
+# 这些通常在UPF之外由综合工具自动处理
+# 但可以定义策略
+
+# ============================================================================
+# 13. 复位隔离定义
+# ============================================================================
+
+# 定义复位隔离策略（可选）
+# 当电源域关闭时，复位信号需要隔离
+# create_isolation_strategy ISO_RESET \
+#   -domain PD_CORE \
+#   -isolation_power_net VDD \
+#   -isolation_ground_net VSS \
+#   -clamp_value 1 \
+#   -location parent \
+#   -applies_to inputs
+
+# ============================================================================
+# 14. 时钟门控定义
+# ============================================================================
+
+# 定义时钟门控策略（可选）
+# 这通常在RTL中实现，UPF主要用于电源管理
+# 但可以定义时钟域的电源状态
+
+# ============================================================================
+# 15. 电源开关控制时序
+# ============================================================================
+
+# 定义电源开关控制信号时序（可选）
+# 这些参数取决于具体的电源开关单元
+
+# 示例：设置控制信号延迟
+# set_port_attributes -name PD_CORE_pwr_switch_delay -value 100ns
+
+# ============================================================================
+# 16. 电源完整性相关定义
+# ============================================================================
+
+# 定义电源网络的电流限制（可选）
+# set_current_limit 1.0 -domain PD_CORE
+
+# 定义电压监控阈值（可选）
+# set_voltage_limit -min 0.81 -max 0.99 -domain PD_CORE
+
+# ============================================================================
+# 17. 测试模式电源状态
+# ============================================================================
+
+# 定义测试模式下的电源状态
+create_power_state PSS_TEST_MODE \
+  -domain TOP \
+  -state {PD_CORE ON_CORE VDD VSS} \
+  -state {PD_PERIPHERAL ON_PERIPH VDD VSS} \
+  -state {PD_MEMORY ON_MEMORY VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# ============================================================================
+# 18. 调试模式电源状态
+# ============================================================================
+
+# 定义调试模式下的电源状态
+create_power_state PSS_DEBUG_MODE \
+  -domain TOP \
+  -state {PD_CORE ON_CORE VDD VSS} \
+  -state {PD_PERIPHERAL ON_PERIPH VDD VSS} \
+  -state {PD_MEMORY ON_MEMORY VDD_0P9 VSS} \
+  -state {PD_ANALOG ON VDD VSS}
+
+# ============================================================================
+# 19. 电源转换规则
+# ============================================================================
+
+# 定义电源状态转换规则（可选）
+# 这些规则确保电源状态转换的安全性
+
+# 示例：不允许从ON直接跳到OFF
+# create_power_transition_rules
+#   -from PSS_FULL_POWER
+#   -to PSS_DEEP_SLEEP
+#   -through {PSS_PERIPH_OFF PSS_MEMORY_OFF}
+
+# ============================================================================
+# 20. 仿真相关定义
+# ============================================================================
+
+# 定义仿真参数（可选）
+# set_simulation_parameters -type power \
+#   -default_supply VDD 0.9
+
+# 设置初始电源状态
+# set_initial_power_state PSS_FULL_POWER
+
+# ============================================================================
+# 注释说明
+# ============================================================================
+#
+# 1. 根据实际设计修改电源域定义和元素
+# 2. 电源开关应根据实际设计需求配置
+# 3. 保持寄存器应谨慎定义，只对需要保持的寄存器
+# 4. 隔离单元位置应根据设计要求选择（self/parent）
+# 5. 电源状态应覆盖所有可能的运行模式
+# 6. 多电压域需要电平转换器（综合工具处理）
+# 7. 测试模式通常需要所有域都上电
+# 8. 定期验证UPF与SDC约束的一致性
+# 9. 使用仿真工具验证UPF定义的正确性
+# 10. 确保UPF与RTL设计一致
+#
+# ============================================================================
+# 常用UPF命令参考
+# ============================================================================
+#
+# 创建电源网络：
+#   create_power_net
+#
+# 创建电源域：
+#   create_power_domain
+#
+# 创建电源开关：
+#   create_power_switch
+#
+# 创建隔离策略：
+#   create_isolation_strategy
+#
+# 创建保持控制：
+#   create_retention_control
+#
+# 创建电源状态：
+#   create_power_state
+#
+# 连接电源网络：
+#   connect_supply_net
+#
+# 设置供电电压：
+#   set_supply_voltage
+#
+# ============================================================================

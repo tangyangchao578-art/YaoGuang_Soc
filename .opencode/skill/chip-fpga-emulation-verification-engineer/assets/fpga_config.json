@@ -1,0 +1,26 @@
+{
+  "project": {
+    "name": "noc_prototype",
+    "top": "noc_top",
+    "part": "xc7k325tffg900-2",
+    "rtl_dir": "rtl",
+    "constraint_file": "constraints/noc_top.xdc"
+  },
+  "tests": {
+    "dir": "tests",
+    "timeout": 300,
+    "parallel": 4
+  },
+  "reports": {
+    "dir": "reports"
+  },
+  "fpga": {
+    "board": "xilinx_kc705",
+    "jtag_freq": 10000000,
+    "power_supply": "12V"
+  },
+  "tools": {
+    "vivado": "/opt/Xilinx/Vivado/2023.2/bin/vivado",
+    "python": "/usr/bin/python3"
+  }
+}
