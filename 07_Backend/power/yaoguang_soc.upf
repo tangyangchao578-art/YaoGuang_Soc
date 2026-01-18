@@ -1,0 +1,74 @@
+# YaoGuang SoC UPF Power Intent
+# 工艺: TSMC 5nm
+
+# 1. 电源域定义
+create_power_domain -name PD_TOP -default
+
+create_power_domain -name PD_CPU \
+  -elements [get_cells -hierarchical *cpu*] \
+  -voltage {0.9}
+
+create_power_domain -name PD_NPU \
+  -elements [get_cells -hierarchical *npu*] \
+  -voltage {0.9}
+
+create_power_domain -name PD_GPU \
+  -elements [get_cells -hierarchical *gpu*] \
+  -voltage {0.9}
+
+create_power_domain -name PD_MEM \
+  -elements [get_cells -hierarchical *mem*] \
+  -voltage {1.1}
+
+create_power_domain -name PD_SYS \
+  -elements [get_cells -hierarchical *sys*] \
+  -voltage {0.9}
+
+create_power_domain -name PD_IO \
+  -elements [get_cells -hierarchical *io*] \
+  -voltage {1.8}
+
+# 2. 电源网络
+create_supply_net VDD -domain PD_TOP
+create_supply_net VDD_CPU -domain PD_CPU
+create_supply_net VDD_NPU -domain PD_NPU
+create_supply_net VDD_GPU -domain PD_GPU
+create_supply_net VDD_MEM -domain PD_MEM
+create_supply_net VDD_SYS -domain PD_SYS
+create_supply_net VDD_IO -domain PD_IO
+create_supply_net VSS -domain PD_TOP
+
+# 3. 电源连接
+connect_supply_net VDD -ports [get_ports VDD]
+connect_supply_net VDD_CPU -ports [get_ports VDD_CPU]
+connect_supply_net VDD_NPU -ports [get_ports VDD_NPU]
+connect_supply_net VDD_GPU -ports [get_ports VDD_GPU]
+connect_supply_net VDD_MEM -ports [get_ports VDD_MEM]
+connect_supply_net VDD_SYS -ports [get_ports VDD_SYS]
+connect_supply_net VDD_IO -ports [get_ports VDD_IO]
+connect_supply_net VSS -ports [get_ports VSS]
+
+# 4. 电源开关
+create_power_switch -name cpu_switch \
+  -domain PD_CPU \
+  -input_supply_port {VDD VDD_CPU} \
+  -output_supply_port {VDD_CPU_OUT VDD} \
+  -control_port {sw_cpu ctrl_cpu} \
+  -on_state {cpu_on VDD_CPU ctrl_cpu} \
+  -off_state {cpu_off VDD !ctrl_cpu}
+
+create_power_switch -name npu_switch \
+  -domain PD_NPU \
+  -input_supply_port {VDD VDD_NPU} \
+  -output_supply_port {VDD_NPU_OUT VDD} \
+  -control_port {sw_npu ctrl_npu} \
+  -on_state {npu_on VDD_NPU ctrl_npu} \
+  -off_state {npu_off VDD !ctrl_npu}
+
+# 5. 状态保持
+set_retention_control -domain PD_CPU \
+  -retention_control_signal {ret_cpu_ctrl}
+
+# 6. 电平移位器
+set_level_shifter -domain PD_CPU -from PD_TOP -to PD_MEM \
+  -elements [get_cells -hierarchical *cpu2mem*]
