@@ -138,6 +138,27 @@ module safety_island_top (
     logic                                    sram_init_done;
 
     //============================================================================
+    // CDC Synchronization for Error Signals (RTL-TOP-001)
+    //============================================================================
+    // Synchronize lockstep_error and ecc_error from clk_safety_gated to clk_safety_i domain
+    logic [2:0]                              lockstep_error_sync;
+    logic [2:0]                              ecc_error_sync;
+
+    always_ff @(posedge clk_safety_i or negedge rst_n_safety_i) begin
+        if (!rst_n_safety_i) begin
+            lockstep_error_sync <= '0;
+            ecc_error_sync <= '0;
+        end else begin
+            lockstep_error_sync[0] <= lockstep_error;
+            lockstep_error_sync[1] <= lockstep_error_sync[0];
+            lockstep_error_sync[2] <= lockstep_error_sync[1];
+            ecc_error_sync[0] <= ecc_error;
+            ecc_error_sync[1] <= ecc_error_sync[0];
+            ecc_error_sync[2] <= ecc_error_sync[1];
+        end
+    end
+
+    //============================================================================
     // Clock and Reset Management
     //============================================================================
     safe_clock_reset u_safe_clk_rst (
@@ -235,7 +256,7 @@ module safety_island_top (
     );
 
     //============================================================================
-    // Safety Watchdog
+    // Safety Watchdog (using synchronized error signals - RTL-TOP-001)
     //============================================================================
     safety_watchdog u_watchdog (
         .clk_i                 (clk_safety_i),
@@ -245,9 +266,8 @@ module safety_island_top (
         .error_o               (watchdog_error),
         .pulse_o               (watchdog_pulse_o),
         .feedback_i            (watchdog_feedback_i),
-        .cfg_enable_i          (cfg_enable_i),
-        .lockstep_error_i      (lockstep_error),
-        .ecc_error_i           (ecc_error),
+        .lockstep_error_i      (lockstep_error_sync[2]),  // Synchronized
+        .ecc_error_i           (ecc_error_sync[2]),       // Synchronized
         .kick_i                (1'b1)
     );
 
@@ -290,13 +310,89 @@ module safety_island_top (
     );
 
     //============================================================================
+    // Safety State Machine (RTL-TOP-002)
+    //============================================================================
+    typedef enum logic [2:0] {
+        STATE_NORMAL  = 3'b000,  // Normal operation
+        STATE_WARNING = 3'b001,  // Error detected, monitoring
+        STATE_SAFE    = 3'b010,  // Reduced functionality mode
+        STATE_RESET   = 3'b011,  // Triggering system reset
+        STATE_FAULT   = 3'b100   // Permanent fault state
+    } safety_state_t;
+
+    safety_state_t safety_state;
+    logic [31:0]                            error_accumulator;
+    logic                                   safety_error_detected;
+    logic                                   reset_request;
+
+    always_ff @(posedge clk_safety_gated or negedge rst_n_safety_synced) begin
+        if (!rst_n_safety_synced) begin
+            safety_state <= STATE_NORMAL;
+            error_accumulator <= '0;
+            safety_error_detected <= 1'b0;
+            reset_request <= 1'b0;
+        end else begin
+            case (safety_state)
+                STATE_NORMAL: begin
+                    if (lockstep_error || ecc_error || watchdog_error) begin
+                        safety_state <= STATE_WARNING;
+                        error_accumulator <= '1;
+                        safety_error_detected <= 1'b1;
+                    end
+                    reset_request <= 1'b0;
+                end
+
+                STATE_WARNING: begin
+                    error_accumulator <= error_accumulator + {31'b0, (lockstep_error || ecc_error || watchdog_error)};
+                    if (error_accumulator > 32'd100) begin
+                        safety_state <= STATE_SAFE;
+                    end else if (watchdog_timeout) begin
+                        safety_state <= STATE_RESET;
+                    end else if (!lockstep_error && !ecc_error && !watchdog_error && !watchdog_timeout) begin
+                        if ($stable(error_accumulator)) begin
+                            safety_state <= STATE_NORMAL;
+                            safety_error_detected <= 1'b0;
+                        end
+                    end
+                end
+
+                STATE_SAFE: begin
+                    // Reduced functionality mode - clock gating, limited operations
+                    if (lockstep_error && ecc_error) begin
+                        safety_state <= STATE_FAULT;
+                    end else if (watchdog_timeout) begin
+                        safety_state <= STATE_RESET;
+                    end
+                end
+
+                STATE_RESET: begin
+                    // Reset request asserted - system should reset
+                    reset_request <= 1'b1;
+                    safety_state <= STATE_NORMAL;
+                end
+
+                STATE_FAULT: begin
+                    // Permanent fault - requires power cycle
+                    reset_request <= 1'b0;
+                end
+
+                default: begin
+                    safety_state <= STATE_NORMAL;
+                end
+            endcase
+        end
+    end
+
+    //============================================================================
     // IRQ Aggregation
     //============================================================================
     assign irq_o[0]  = lockstep_error;
     assign irq_o[1]  = ecc_error;
     assign irq_o[2]  = watchdog_timeout | watchdog_error;
-    assign irq_o[3]  = 1'b0;
-    assign irq_o[63:4] = '0;
-    assign irq_fault_o = lockstep_error | ecc_error | watchdog_error;
+    assign irq_o[3]  = safety_error_detected;
+    assign irq_o[4]  = (safety_state == STATE_SAFE);
+    assign irq_o[5]  = (safety_state == STATE_FAULT);
+    assign irq_o[63:6] = '0;
+    assign irq_fault_o = lockstep_error | ecc_error | watchdog_error | safety_error_detected;
 
 endmodule

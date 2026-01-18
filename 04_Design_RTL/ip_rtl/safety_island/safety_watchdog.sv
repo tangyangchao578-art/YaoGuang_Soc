@@ -26,9 +26,14 @@ module safety_watchdog (
     input  logic                            feedback_i,
 
     //============================================================================
-    // Configuration
+    // Configuration (Removed - Watchdog always enabled for ASIL-D)
     //============================================================================
-    input  logic                            cfg_enable_i,
+    // input  logic                            cfg_enable_i,  // REMOVED per RTL-WDT-002
+
+    //============================================================================
+    // Direct Reset Request Output (RTL-WDT-004)
+    //============================================================================
+    output logic                            reset_request_o,
 
     //============================================================================
     // Error Inputs from Other Safety Modules
@@ -79,16 +84,16 @@ module safety_watchdog (
     assign external_kick = feedback_sync[2];
 
     //============================================================================
-    // Watchdog Enable
+    // Watchdog Enable (Always enabled for ASIL-D - RTL-WDT-002)
     //============================================================================
+    assign watchdog_enable = 1'b1;  // Hardware fixed - cannot be disabled by software
+
     always_ff @(posedge clk_i or negedge rst_n_i) begin
         if (!rst_n_i) begin
-            watchdog_enable <= 1'b1;
             window_mode <= 1'b0;
             window_open <= 32'h0000_1000;
             window_close <= 32'h0000_F000;
         end else begin
-            watchdog_enable <= cfg_enable_i;
             window_mode <= 1'b1;
             window_open <= 32'h0000_1000;
             window_close <= 32'h0000_F000;
@@ -102,7 +107,7 @@ module safety_watchdog (
         if (!rst_n_i) begin
             in_window <= 1'b0;
         end else begin
-            in_window = (counter >= window_open) && (counter < window_close);
+            in_window <= (counter >= window_open) && (counter < window_close);
         end
     end
 
@@ -163,5 +168,10 @@ module safety_watchdog (
     end
 
     assign pulse_o = pulse_reg && watchdog_enable;
+
+    //============================================================================
+    // Direct Reset Request Output (RTL-WDT-004)
+    //============================================================================
+    assign reset_request_o = timeout_o | error_o | lockstep_error_i | ecc_error_i;
 
 endmodule
